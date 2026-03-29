@@ -1,0 +1,26 @@
+<script>
+  document.getElementById("leadForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", document.getElementById("name").value);
+    formData.append("phone", document.getElementById("phone").value);
+    formData.append("email", document.getElementById("email").value);
+    formData.append("service", document.getElementById("service").value);
+    formData.append("zip_code", document.getElementById("zip_code").value);
+    formData.append("notes", document.getElementById("notes").value);
+
+    try {
+      const response = await fetch("https://leadforge-llc.onrender.com/lead", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+      alert(JSON.stringify(result));
+    } catch (error) {
+      alert("Error submitting form");
+      console.error(error);
+    }
+  });
+</script>
