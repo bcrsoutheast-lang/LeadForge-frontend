@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadForge Contractor Signup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    .agreement {
+      height: 220px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fafafa;
+      margin-bottom: 12px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .checkbox-row input {
+      width: auto;
+      margin: 3px 0 0 0;
+    }
+
+    .checkbox-row label {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    button {
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    #msg {
+      margin-top: 14px;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Contractor Signup</h1>
+
+    <form id="form">
+      <input type="text" id="first_name" placeholder="First Name" required />
+      <input type="text" id="last_name" placeholder="Last Name" required />
+      <input type="text" id="business_name" placeholder="Business Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="phone" placeholder="Phone" required />
+      <input type="text" id="trade" placeholder="Trade (Roofing, HVAC, etc.)" required />
+      <input type="text" id="service_area" placeholder="Service Area" required />
+      <input type="text" id="experience_years" placeholder="Years Experience" />
+      <input type="text" id="license_number" placeholder="License Number (if any)" />
+
+      <select id="insured">
+        <option value="true">Insured</option>
+        <option value="false">Not Insured</option>
+      </select>
+
+      <h3>Contract Agreement</h3>
+
+      <div class="agreement">
+        <strong>LeadForge LLC Contractor Agreement</strong><br><br>
+        Contractor agrees that all payments for platform-introduced jobs must go through LeadForge LLC.
+        Contractor may not accept direct payment from homeowners introduced through the platform.
+        LeadForge LLC may hold funds until job completion and release payment according to platform rules.
+        LeadForge LLC retains a platform fee.
+        Contractor agrees not to bypass or circumvent LeadForge LLC during the job or for 12 months after introduction.
+        Contractor is responsible for their own licensing, insurance, taxes, safety, work quality, and legal compliance.
+        By checking the box below and submitting this application, Contractor agrees to these terms.
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="agree" required />
+        <label for="agree">I agree to the Contractor Agreement</label>
+      </div>
+
+      <button type="submit" id="submitBtn">Submit</button>
+    </form>
+
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const form = document.getElementById("form");
+    const msg = document.getElementById("msg");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      msg.className = "";
+      msg.textContent = "";
+
+      const agreed = document.getElementById("agree").checked;
+
+      if (!agreed) {
+        msg.className = "error";
+        msg.textContent = "You must agree to the terms before submitting.";
+        return;
+      }
+
+      const data = {
+        first_name: document.getElementById("first_name").value.trim(),
+        last_name: document.getElementById("last_name").value.trim(),
+        business_name: document.getElementById("business_name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        trade: document.getElementById("trade").value.trim(),
+        service_area: document.getElementById("service_area").value.trim(),
+        experience_years: document.getElementById("experience_years").value.trim(),
+        license_number: document.getElementById("license_number").value.trim(),
+        insured: document.getElementById("insured").value === "true",
+        agreed_to_terms: true,
+        agreement_version: "v1.0"
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const res = await fetch(`${API_BASE}/contractors`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.detail || "Submission failed.");
+        }
+
+        msg.className = "success";
+        msg.textContent = "Submitted successfully. Pending approval.";
+        form.reset();
+      } catch (err) {
+        msg.className = "error";
+        msg.textContent = err.message || "Error submitting form.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+      }
+    });
+  </script>
+</body>
+</html>
