@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadForge Contractor Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .top-link {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .top-link a {
+      text-decoration: none;
+      color: #111;
+      font-weight: bold;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .row {
+      margin-bottom: 8px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    .status.pending {
+      background: #fff3cd;
+    }
+
+    .status.approved {
+      background: #d4edda;
+    }
+
+    .status.rejected {
+      background: #f8d7da;
+    }
+
+    .actions {
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 8px;
+    }
+
+    .approve-btn {
+      background: green;
+      color: white;
+    }
+
+    .reject-btn {
+      background: red;
+      color: white;
+    }
+
+    .refresh-btn {
+      background: #111;
+      color: white;
+    }
+
+    .message {
+      text-align: center;
+      margin-bottom: 18px;
+      font-weight: bold;
+      white-space: pre-wrap;
+    }
+
+    .empty {
+      text-align: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .small {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .debug {
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>LeadForge Contractor Admin</h1>
+
+    <div class="top-link">
+      <a href="index.html">← Back to Home</a>
+    </div>
+
+    <div style="text-align:center; margin-bottom:20px;">
+      <button class="refresh-btn" id="refreshBtn">Refresh List</button>
+    </div>
+
+    <div id="message" class="message"></div>
+    <div id="debug" class="debug">Waiting to load...</div>
+    <div id="contractorList"></div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const contractorList = document.getElementById("contractorList");
+    const message = document.getElementById("message");
+    const debug = document.getElementById("debug");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    async function loadContractors() {
+      contractorList.innerHTML = "";
+      message.textContent = "Loading contractors...";
+      debug.textContent = "Calling: " + API_BASE + "/admin";
+
+      try {
+        const response = await fetch(`${API_BASE}/admin?t=${Date.now()}`, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        const rawText = await response.text();
+        debug.textContent = `HTTP ${response.status}\n${rawText.substring(0, 500)}`;
+
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+
+        let result;
+        try {
+          result = JSON.parse(rawText);
+        } catch (e) {
+          throw new Error("Response was not valid JSON.");
+        }
+
+        const contractors = Array.isArray(result.data) ? result.data : [];
+
+        if (contractors.length === 0) {
+          message.textContent = "";
+          contractorList.innerHTML = `<div class="empty">No contractors found.</div>`;
+          return;
+        }
+
+        message.textContent = `Loaded ${contractors.length} contractor(s).`;
+
+        contractors.forEach((contractor) => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const status = (contractor.status || "pending").toLowerCase();
+
+          card.innerHTML = `
+            <div class="row"><span class="label">Name:</span> ${contractor.first_name || ""} ${contractor.last_name || ""}</div>
+            <div class="row"><span class="label">Business:</span> ${contractor.business_name || ""}</div>
+            <div class="row"><span class="label">Email:</span> ${contractor.email || ""}</div>
+            <div class="row"><span class="label">Phone:</span> ${contractor.phone || ""}</div>
+            <div class="row"><span class="label">Trade:</span> ${contractor.trade || ""}</div>
+            <div class="row"><span class="label">Service Area:</span> ${contractor.service_area || ""}</div>
+            <div class="row"><span class="label">Experience:</span> ${contractor.experience_years || ""}</div>
+            <div class="row"><span class="label">License:</span> ${contractor.license_number || ""}</div>
+            <div class="row"><span class="label">Insured:</span> ${contractor.insured === true ? "Yes" : "No"}</div>
+            <div class="row"><span class="label">Agreed to Terms:</span> ${contractor.agreed_to_terms === true ? "Yes" : "No"}</div>
+            <div class="row"><span class="label">Agreement Version:</span> ${contractor.agreement_version || ""}</div>
+            <div class="row"><span class="label">Status:</span> <span class="status ${status}">${status}</span></div>
+            <div class="row small"><span class="label">ID:</span> ${contractor.id || ""}</div>
+
+            <div class="actions">
+              <button class="approve-btn" onclick="approveContractor('${contractor.id}')">Approve</button>
+              <button class="reject-btn" onclick="rejectContractor('${contractor.id}')">Reject</button>
+            </div>
+          `;
+
+          contractorList.appendChild(card);
+        });
+      } catch (error) {
+        message.textContent = "Load failed.";
+        debug.textContent = "Error: " + (error.message || error);
+      }
+    }
+
+    async function approveContractor(id) {
+      try {
+        const response = await fetch(`${API_BASE}/contractors/approve/${id}`, {
+          method: "POST",
+          cache: "no-store"
+        });
+
+        const rawText = await response.text();
+
+        if (!response.ok) {
+          throw new Error(rawText || "Failed to approve contractor.");
+        }
+
+        message.textContent = "Contractor approved.";
+        loadContractors();
+      } catch (error) {
+        message.textContent = "Approve failed.";
+        debug.textContent = "Error: " + (error.message || error);
+      }
+    }
+
+    async function rejectContractor(id) {
+      try {
+        const response = await fetch(`${API_BASE}/contractors/reject/${id}`, {
+          method: "POST",
+          cache: "no-store"
+        });
+
+        const rawText = await response.text();
+
+        if (!response.ok) {
+          throw new Error(rawText || "Failed to reject contractor.");
+        }
+
+        message.textContent = "Contractor rejected.";
+        loadContractors();
+      } catch (error) {
+        message.textContent = "Reject failed.";
+        debug.textContent = "Error: " + (error.message || error);
+      }
+    }
+
+    refreshBtn.addEventListener("click", loadContractors);
+
+    loadContractors();
+  </script>
+</body>
+</html>
