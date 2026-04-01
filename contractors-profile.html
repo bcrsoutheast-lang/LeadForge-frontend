@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadForge | Contractor Profile</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    .header {
+      background: #111827;
+      color: white;
+      padding: 18px 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: #d1d5db;
+      font-size: 15px;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 30px auto;
+      padding: 0 16px 40px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 18px;
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: bold;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .profile-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .profile-main h2 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      color: #111827;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .meta-item {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6b7280;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .meta-value {
+      font-size: 15px;
+      color: #111827;
+      word-break: break-word;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 22px;
+      color: #111827;
+    }
+
+    .about-text {
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      white-space: pre-line;
+    }
+
+    .request-box {
+      border: 2px solid #dbeafe;
+      background: #eff6ff;
+    }
+
+    .request-box .section-title {
+      color: #1d4ed8;
+    }
+
+    .exclusive-note {
+      background: #111827;
+      color: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .exclusive-note strong {
+      color: #93c5fd;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      background: white;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .button {
+      border: none;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      transition: 0.2s ease;
+    }
+
+    .button:hover {
+      background: #1d4ed8;
+    }
+
+    .button:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .status-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .loading,
+    .not-found {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+      font-size: 18px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .profile-main h2 {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LeadForge</h1>
+    <p>Homeowners choose the contractor they want — exclusive requests only.</p>
+  </div>
+
+  <div class="container">
+    <a class="back-link" href="/contractors.html">← Back to Contractors</a>
+
+    <div id="loadingState" class="loading">Loading contractor profile...</div>
+    <div id="notFoundState" class="not-found" style="display: none;">Contractor not found.</div>
+
+    <div id="profileContent" style="display: none;">
+      <div class="card">
+        <div class="profile-top">
+          <div class="profile-main">
+            <div class="badge" id="contractorCategory">Contractor</div>
+            <h2 id="businessName">Business Name</h2>
+            <div id="contactNameWrap" style="margin-bottom: 8px; color: #4b5563; font-size: 16px;">
+              Contact: <span id="contactName">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta">
+          <div class="meta-item">
+            <div class="meta-label">City</div>
+            <div class="meta-value" id="cityState">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Category</div>
+            <div class="meta-value" id="categoryValue">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Services</div>
+            <div class="meta-value" id="servicesValue">—</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Website</div>
+            <div class="meta-value" id="websiteValue">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="section-title">About This Contractor</h3>
+        <p class="about-text" id="bioText">No bio provided yet.</p>
+      </div>
+
+      <div class="card request-box">
+        <h3 class="section-title">Request This Contractor</h3>
+
+        <div class="exclusive-note">
+          <strong>Exclusive Request:</strong> When you submit this form, your request goes only to this contractor.
+          LeadForge allows only <strong>one active homeowner request at a time</strong>.
+          If you already have an active request in the system, another request will be denied.
+        </div>
+
+        <form id="leadForm">
+          <div class="form-grid">
+            <div>
+              <label for="homeowner_name">Your Full Name</label>
+              <input type="text" id="homeowner_name" name="homeowner_name" required />
+            </div>
+
+            <div>
+              <label for="project_type">Project Type</label>
+              <select id="project_type" name="project_type" required>
+                <option value="">Select a project</option>
+                <option value="Roofing">Roofing</option>
+                <option value="Siding">Siding</option>
+                <option value="Gutters">Gutters</option>
+                <option value="Painting">Painting</option>
+                <option value="Flooring">Flooring</option>
+                <option value="Kitchen & Bath">Kitchen & Bath</option>
+                <option value="Remodeling">Remodeling</option>
+                <option value="HVAC">HVAC</option>
+                <option value="Plumbing">Plumbing</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Decks">Decks</option>
+                <option value="Fencing">Fencing</option>
+                <option value="Windows & Doors">Windows & Doors</option>
+                <option value="Concrete">Concrete</option>
+                <option value="Landscaping">Landscaping</option>
+                <option value="Handyman">Handyman</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="homeowner_email">Email</label>
+              <input type="email" id="homeowner_email" name="homeowner_email" />
+            </div>
+
+            <div>
+              <label for="homeowner_phone">Phone</label>
+              <input type="tel" id="homeowner_phone" name="homeowner_phone" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="property_address">Project Address</label>
+              <input type="text" id="property_address" name="property_address" />
+            </div>
+
+            <div>
+              <label for="city">City</label>
+              <input type="text" id="city" name="city" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="state">State</label>
+              <input type="text" id="state" name="state" maxlength="2" />
+            </div>
+
+            <div>
+              <label for="zip_code">ZIP Code</label>
+              <input type="text" id="zip_code" name="zip_code" />
+            </div>
+          </div>
+
+          <div>
+            <label for="message">Tell the contractor what you need</label>
+            <textarea id="message" name="message" placeholder="Describe your project, timing, and anything important..."></textarea>
+          </div>
+
+          <button type="submit" class="button" id="submitButton">Send Exclusive Request</button>
+        </form>
+
+        <div id="successMessage" class="status-message status-success"></div>
+        <div id="errorMessage" class="status-message status-error"></div>
+      </div>
+
+      <div class="footer-note">
+        LeadForge homeowners choose one contractor at a time.
+        Contractors receive an exclusive request notification through the platform.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+    const params = new URLSearchParams(window.location.search);
+    const contractorId = params.get("id");
+
+    const loadingState = document.getElementById("loadingState");
+    const notFoundState = document.getElementById("notFoundState");
+    const profileContent = document.getElementById("profileContent");
+
+    const businessNameEl = document.getElementById("businessName");
+    const contactNameEl = document.getElementById("contactName");
+    const contractorCategoryEl = document.getElementById("contractorCategory");
+    const cityStateEl = document.getElementById("cityState");
+    const categoryValueEl = document.getElementById("categoryValue");
+    const servicesValueEl = document.getElementById("servicesValue");
+    const websiteValueEl = document.getElementById("websiteValue");
+    const bioTextEl = document.getElementById("bioText");
+
+    const leadForm = document.getElementById("leadForm");
+    const submitButton = document.getElementById("submitButton");
+    const successMessage = document.getElementById("successMessage");
+    const errorMessage = document.getElementById("errorMessage");
+
+    function showSuccess(message) {
+      successMessage.style.display = "block";
+      errorMessage.style.display = "none";
+      successMessage.textContent = message;
+      successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function showError(message) {
+      errorMessage.style.display = "block";
+      successMessage.style.display = "none";
+      errorMessage.textContent = message;
+      errorMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function clearMessages() {
+      successMessage.style.display = "none";
+      errorMessage.style.display = "none";
+      successMessage.textContent = "";
+      errorMessage.textContent = "";
+    }
+
+    function safeValue(value, fallback = "—") {
+      if (value === null || value === undefined || String(value).trim() === "") {
+        return fallback;
+      }
+      return String(value);
+    }
+
+    async function loadContractor() {
+      if (!contractorId) {
+        loadingState.style.display = "none";
+        notFoundState.style.display = "block";
+        notFoundState.textContent = "Missing contractor ID.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/contractors/${contractorId}`);
+        if (!response.ok) {
+          throw new Error("Contractor not found");
+        }
+
+        const contractor = await response.json();
+
+        businessNameEl.textContent = safeValue(contractor.business_name, "Contractor");
+        contactNameEl.textContent = safeValue(contractor.contact_name, "Not listed");
+        contractorCategoryEl.textContent = safeValue(contractor.category, "Contractor");
+        categoryValueEl.textContent = safeValue(contractor.category, "Not listed");
+
+        const city = safeValue(contractor.city, "");
+        const state = safeValue(contractor.state, "");
+        const cityState = [city, state].filter(v => v && v !== "—").join(", ");
+        cityStateEl.textContent = cityState || "Not listed";
+
+        servicesValueEl.textContent = safeValue(contractor.services, "Not listed");
+        bioTextEl.textContent = safeValue(contractor.bio, "No bio provided yet.");
+
+        if (contractor.website && String(contractor.website).trim() !== "") {
+          const link = document.createElement("a");
+          let url = contractor.website.trim();
+          if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+          }
+          link.href = url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = contractor.website;
+          websiteValueEl.innerHTML = "";
+          websiteValueEl.appendChild(link);
+        } else {
+          websiteValueEl.textContent = "Not listed";
+        }
+
+        loadingState.style.display = "none";
+        profileContent.style.display = "block";
+      } catch (error) {
+        loadingState.style.display = "none";
+        notFoundState.style.display = "block";
+      }
+    }
+
+    leadForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearMessages();
+
+      const homeownerEmail = document.getElementById("homeowner_email").value.trim();
+      const homeownerPhone = document.getElementById("homeowner_phone").value.trim();
+
+      if (!homeownerEmail && !homeownerPhone) {
+        showError("Please enter at least an email or phone number.");
+        return;
+      }
+
+      const payload = {
+        contractor_id: contractorId,
+        homeowner_name: document.getElementById("homeowner_name").value.trim(),
+        homeowner_email: homeownerEmail,
+        homeowner_phone: homeownerPhone,
+        property_address: document.getElementById("property_address").value.trim(),
+        city: document.getElementById("city").value.trim(),
+        state: document.getElementById("state").value.trim(),
+        zip_code: document.getElementById("zip_code").value.trim(),
+        project_type: document.getElementById("project_type").value.trim(),
+        message: document.getElementById("message").value.trim()
+      };
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending...";
+
+      try {
+        const response = await fetch(`${API_BASE}/leads`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          const serverMessage = result.detail || result.message || "Something went wrong.";
+          showError(serverMessage);
+          submitButton.disabled = false;
+          submitButton.textContent = "Send Exclusive Request";
+          return;
+        }
+
+        showSuccess(
+          result.message ||
+          "Your request was sent. Only one contractor request is allowed at a time."
+        );
+
+        leadForm.reset();
+      } catch (error) {
+        showError("Could not send request right now. Please try again.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Send Exclusive Request";
+      }
+    });
+
+    loadContractor();
+  </script>
+</body>
+</html>
