@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadForge Admin Panel</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    th {
+      background: #f9fafb;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .approve {
+      background: #16a34a;
+    }
+
+    .reject {
+      background: #dc2626;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .approved {
+      color: green;
+    }
+
+    .pending {
+      color: orange;
+    }
+
+    .rejected {
+      color: red;
+    }
+
+    .refresh {
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>LeadForge Admin Panel</h1>
+</header>
+
+<div class="container">
+
+  <button class="refresh" onclick="loadData()">Refresh</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Business</th>
+        <th>Contact</th>
+        <th>Location</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+  </table>
+
+</div>
+
+<script>
+const API = "https://leadforge-llc.onrender.com";
+
+async function loadData() {
+  const res = await fetch(API + "/admin");
+  const data = await res.json();
+
+  const table = document.getElementById("tableBody");
+  table.innerHTML = "";
+
+  data.forEach(c => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${c.id}</td>
+      <td>${c.business_name || ""}</td>
+      <td>${c.contact_name || ""}</td>
+      <td>${c.city || ""}, ${c.state || ""}</td>
+      <td>${c.category || ""}</td>
+      <td class="status ${c.status}">${c.status}</td>
+      <td>
+        <button class="btn approve" onclick="approve(${c.id})">Approve</button>
+        <button class="btn reject" onclick="reject(${c.id})">Reject</button>
+      </td>
+    `;
+
+    table.appendChild(row);
+  });
+}
+
+async function approve(id) {
+  await fetch(API + "/contractors/approve/" + id, {
+    method: "POST"
+  });
+  loadData();
+}
+
+async function reject(id) {
+  await fetch(API + "/contractors/reject/" + id, {
+    method: "POST"
+  });
+  loadData();
+}
+
+loadData();
+</script>
+
+</body>
+</html>
