@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadForge Admin</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 14px 40px;
+    }
+
+    .header {
+      margin-bottom: 18px;
+    }
+
+    .title {
+      margin: 0 0 6px 0;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    .sub {
+      margin: 0;
+      font-size: 14px;
+      color: #6b7280;
+      word-break: break-word;
+    }
+
+    .topbar {
+      margin: 18px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .refresh-btn {
+      background: #111827;
+      color: white;
+    }
+
+    .approve-btn {
+      background: #16a34a;
+      color: white;
+    }
+
+    .reject-btn {
+      background: #dc2626;
+      color: white;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .status-box {
+      display: none;
+      margin: 0 0 18px 0;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-box.show {
+      display: block;
+    }
+
+    .status-info {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .status-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .cards {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      margin: 0 0 4px 0;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .card-subtitle {
+      margin: 0;
+      color: #4b5563;
+      font-size: 15px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      text-transform: capitalize;
+    }
+
+    .pill.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .pill.approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .pill.rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .detail {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .detail-label {
+      font-size: 11px;
+      color: #6b7280;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      letter-spacing: 0.04em;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .empty {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 28px 18px;
+      text-align: center;
+      color: #6b7280;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .title {
+        font-size: 24px;
+      }
+
+      .card-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions button,
+      .refresh-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1 class="title">LeadForge Admin Panel</h1>
+      <p class="sub">Backend: https://leadforge-llc.onrender.com/admin</p>
+    </div>
+
+    <div class="topbar">
+      <button class="refresh-btn" id="refreshBtn">Refresh Contractors</button>
+      <div class="meta" id="lastUpdated">Not loaded yet</div>
+    </div>
+
+    <div id="statusBox" class="status-box status-info"></div>
+
+    <div class="summary">
+      <div class="summary-card">
+        <div class="summary-label">Total</div>
+        <div class="summary-value" id="totalCount">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Pending</div>
+        <div class="summary-value" id="pendingCount">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Approved</div>
+        <div class="summary-value" id="approvedCount">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Rejected</div>
+        <div class="summary-value" id="rejectedCount">0</div>
+      </div>
+    </div>
+
+    <div id="cards" class="cards"></div>
+  </div>
+
+  <script>
+    const ADMIN_URL = "https://leadforge-llc.onrender.com/admin";
+    const APPROVE_URL = "https://leadforge-llc.onrender.com/contractors/approve/";
+    const REJECT_URL = "https://leadforge-llc.onrender.com/contractors/reject/";
+
+    const refreshBtn = document.getElementById("refreshBtn");
+    const cards = document.getElementById("cards");
+    const statusBox = document.getElementById("statusBox");
+    const lastUpdated = document.getElementById("lastUpdated");
+
+    const totalCount = document.getElementById("totalCount");
+    const pendingCount = document.getElementById("pendingCount");
+    const approvedCount = document.getElementById("approvedCount");
+    const rejectedCount = document.getElementById("rejectedCount");
+
+    function showStatus(message, type) {
+      statusBox.className = "status-box show";
+
+      if (type === "success") {
+        statusBox.classList.add("status-success");
+      } else if (type === "error") {
+        statusBox.classList.add("status-error");
+      } else {
+        statusBox.classList.add("status-info");
+      }
+
+      statusBox.textContent = message;
+    }
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getField(obj, keys) {
+      for (const key of keys) {
+        if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+          return obj[key];
+        }
+      }
+      return "";
+    }
+
+    function normalizeList(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.contractors)) return data.contractors;
+      if (data && Array.isArray(data.data)) return data.data;
+      if (data && Array.isArray(data.results)) return data.results;
+      return [];
+    }
+
+    function getStatus(item) {
+      const statusText = String(getField(item, ["status", "approval_status"])).toLowerCase();
+      const approvedFlag = getField(item, ["approved", "is_approved"]);
+
+      if (statusText.includes("approve")) return "approved";
+      if (statusText.includes("reject")) return "rejected";
+      if (approvedFlag === true) return "approved";
+      if (approvedFlag === false && statusText) return "rejected";
+
+      return "pending";
+    }
+
+    function getDisplayName(item) {
+      return getField(item, [
+        "name",
+        "full_name",
+        "contractor_name",
+        "contact_name",
+        "owner_name",
+        "first_name",
+        "company_name",
+        "business_name"
+      ]) || "Unnamed Contractor";
+    }
+
+    function getDisplaySubtitle(item) {
+      return getField(item, [
+        "company",
+        "company_name",
+        "business_name",
+        "service",
+        "services",
+        "trade",
+        "category",
+        "specialty"
+      ]) || "No company or service listed";
+    }
+
+    function formatWebsite(url) {
+      if (!url) return "—";
+      const safe = escapeHtml(url);
+      if (String(url).startsWith("http://") || String(url).startsWith("https://")) {
+        return '<a href="' + safe + '" target="_blank" rel="noopener noreferrer">' + safe + '</a>';
+      }
+      return safe;
+    }
+
+    function updateSummary(list) {
+      totalCount.textContent = list.length;
+      pendingCount.textContent = list.filter(x => getStatus(x) === "pending").length;
+      approvedCount.textContent = list.filter(x => getStatus(x) === "approved").length;
+      rejectedCount.textContent = list.filter(x => getStatus(x) === "rejected").length;
+    }
+
+    function renderCards(list) {
+      if (!list.length) {
+        cards.innerHTML = '<div class="empty">No contractors found.</div>';
+        return;
+      }
+
+      cards.innerHTML = list.map(item => {
+        const id = getField(item, ["id"]);
+        const status = getStatus(item);
+        const displayName = getDisplayName(item);
+        const subtitle = getDisplaySubtitle(item);
+
+        const company = getField(item, ["company", "company_name", "business_name"]);
+        const email = getField(item, ["email"]);
+        const phone = getField(item, ["phone", "phone_number", "mobile"]);
+        const service = getField(item, ["service", "services", "trade", "category", "specialty"]);
+        const city = getField(item, ["city"]);
+        const state = getField(item, ["state"]);
+        const zip = getField(item, ["zip", "zipcode", "postal_code"]);
+        const website = getField(item, ["website", "site_url"]);
+        const experience = getField(item, ["experience", "years_experience"]);
+        const created = getField(item, ["created_at", "submitted_at", "date_created"]);
+        const notes = getField(item, ["notes", "message", "description"]);
+
+        return `
+          <div class="card">
+            <div class="card-top">
+              <div>
+                <h2 class="card-title">${escapeHtml(displayName)}</h2>
+                <p class="card-subtitle">${escapeHtml(subtitle)}</p>
+              </div>
+              <span class="pill ${status}">${escapeHtml(status)}</span>
+            </div>
+
+            <div class="details">
+              <div class="detail">
+                <div class="detail-label">ID</div>
+                <div class="detail-value">${escapeHtml(id || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Company</div>
+                <div class="detail-value">${escapeHtml(company || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Email</div>
+                <div class="detail-value">${escapeHtml(email || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">${escapeHtml(phone || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Service</div>
+                <div class="detail-value">${escapeHtml(service || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Location</div>
+                <div class="detail-value">${escapeHtml([city, state, zip].filter(Boolean).join(", ") || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Website</div>
+                <div class="detail-value">${formatWebsite(website)}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Experience</div>
+                <div class="detail-value">${escapeHtml(experience || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Created</div>
+                <div class="detail-value">${escapeHtml(created || "—")}</div>
+              </div>
+
+              <div class="detail">
+                <div class="detail-label">Notes</div>
+                <div class="detail-value">${escapeHtml(notes || "—")}</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="approve-btn" onclick="approveContractor('${escapeHtml(String(id || ""))}')" ${id ? "" : "disabled"}>Approve</button>
+              <button class="reject-btn" onclick="rejectContractor('${escapeHtml(String(id || ""))}')" ${id ? "" : "disabled"}>Reject</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadContractors() {
+      refreshBtn.disabled = true;
+      showStatus("Loading contractors...", "info");
+
+      try {
+        const response = await fetch(ADMIN_URL, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Admin fetch failed: " + response.status + " " + response.statusText);
+        }
+
+        const data = await response.json();
+        const list = normalizeList(data);
+
+        updateSummary(list);
+        renderCards(list);
+        lastUpdated.textContent = "Last updated: " + new Date().toLocaleString();
+        showStatus("Loaded " + list.length + " contractor record(s).", "success");
+      } catch (error) {
+        console.error(error);
+        updateSummary([]);
+        cards.innerHTML = '<div class="empty">Could not load contractors.</div>';
+        showStatus("Error loading contractors: " + error.message, "error");
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    async function approveContractor(id) {
+      if (!id) {
+        showStatus("Missing contractor id.", "error");
+        return;
+      }
+
+      showStatus("Approving contractor...", "info");
+
+      try {
+        const response = await fetch(APPROVE_URL + encodeURIComponent(id), {
+          method: "POST",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Approve failed: " + response.status + " " + response.statusText);
+        }
+
+        showStatus("Contractor approved. Refreshing...", "success");
+        await loadContractors();
+      } catch (error) {
+        console.error(error);
+        showStatus("Error approving contractor: " + error.message, "error");
+      }
+    }
+
+    async function rejectContractor(id) {
+      if (!id) {
+        showStatus("Missing contractor id.", "error");
+        return;
+      }
+
+      showStatus("Rejecting contractor...", "info");
+
+      try {
+        const response = await fetch(REJECT_URL + encodeURIComponent(id), {
+          method: "POST",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Reject failed: " + response.status + " " + response.statusText);
+        }
+
+        showStatus("Contractor rejected. Refreshing...", "success");
+        await loadContractors();
+      } catch (error) {
+        console.error(error);
+        showStatus("Error rejecting contractor: " + error.message, "error");
+      }
+    }
+
+    refreshBtn.addEventListener("click", loadContractors);
+    window.approveContractor = approveContractor;
+    window.rejectContractor = rejectContractor;
+
+    loadContractors();
+  </script>
+</body>
+</html>
