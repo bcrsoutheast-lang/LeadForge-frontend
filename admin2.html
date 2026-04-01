@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadForge Admin</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    #status {
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .line {
+      margin-bottom: 4px;
+    }
+
+    .buttons {
+      margin-top: 12px;
+    }
+
+    button {
+      margin-right: 8px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .approve {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .reject {
+      background: #dc2626;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>LeadForge Admin</h1>
+
+  <div id="status">Loading...</div>
+  <div id="list"></div>
+
+  <script>
+    const API = "https://leadforge-llc.onrender.com";
+
+    function setStatus(message) {
+      document.getElementById("status").innerText = message;
+    }
+
+    function renderContractors(data) {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      if (!Array.isArray(data) || data.length === 0) {
+        list.innerHTML = "<div class='card'>No contractors found.</div>";
+        return;
+      }
+
+      data.forEach((c) => {
+        const id = c.id || "";
+        const name = c.name || "No Name";
+        const email = c.email || "";
+        const phone = c.phone || "";
+        const status = c.status || "pending";
+
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+          <div class="name">${name}</div>
+          <div class="line"><strong>Email:</strong> ${email}</div>
+          <div class="line"><strong>Phone:</strong> ${phone}</div>
+          <div class="line"><strong>Status:</strong> ${status}</div>
+          <div class="buttons">
+            <button class="approve" onclick="approveContractor('${id}')">Approve</button>
+            <button class="reject" onclick="rejectContractor('${id}')">Reject</button>
+          </div>
+        `;
+
+        list.appendChild(div);
+      });
+    }
+
+    function loadContractors() {
+      setStatus("Fetching contractors...");
+
+      fetch(API + "/admin")
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to load contractors: " + response.status);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setStatus("Loaded " + data.length + " contractors");
+          renderContractors(data);
+        })
+        .catch((error) => {
+          setStatus("Error: " + error.message);
+        });
+    }
+
+    function approveContractor(id) {
+      fetch(API + "/contractors/approve/" + id, { method: "POST" })
+        .then(() => loadContractors());
+    }
+
+    function rejectContractor(id) {
+      fetch(API + "/contractors/reject/" + id, { method: "POST" })
+        .then(() => loadContractors());
+    }
+
+    loadContractors();
+  </script>
+
+</body>
+</html>
