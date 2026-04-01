@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/admin.html", "dest": "/admin.html" },
+    { "src": "/contractors.html", "dest": "/contractors.html" },
+    { "src": "/contractors-list.html", "dest": "/contractors-list.html" },
+    { "src": "/contractor-profile.html", "dest": "/contractor-profile.html" },
+    { "src": "/admin2.html", "dest": "/admin2.html" },
+    { "src": "/admin-page.html", "dest": "/admin-page.html" }
+  ]
+}
