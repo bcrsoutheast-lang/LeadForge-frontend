@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Unlock Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f7fb;
+      color: #111;
+    }
+    .box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+    }
+    button {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      margin: 8px 8px 8px 0;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .green { background: #16a34a; color: white; }
+    .black { background: #111827; color: white; }
+    .gray { background: #e5e7eb; color: #111827; }
+    .field {
+      margin: 12px 0;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    .label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #6b7280;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .value {
+      font-size: 16px;
+      word-break: break-word;
+    }
+    #msg {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>LeadForge Unlock Test</h1>
+    <p>Testing the real backend unlock flow on the root page.</p>
+
+    <div class="field">
+      <div class="label">Lead ID</div>
+      <div class="value" id="leadId">e27a1c37-d7be-4d6e-b582-6f8982eecf7c</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Status</div>
+      <div class="value" id="status">Loading...</div>
+    </div>
+
+    <button class="gray" onclick="loadPreview()">Refresh Preview</button>
+    <button class="green" onclick="unlockLead()">Test Unlock</button>
+    <button class="black" onclick="loadFull()">View Full Lead</button>
+
+    <div id="msg"></div>
+
+    <h2>Preview</h2>
+
+    <div class="field">
+      <div class="label">Service</div>
+      <div class="value" id="service">—</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Zip</div>
+      <div class="value" id="zip">—</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Project</div>
+      <div class="value" id="project">—</div>
+    </div>
+
+    <h2>Full Lead</h2>
+
+    <div class="field">
+      <div class="label">Name</div>
+      <div class="value" id="name">Locked</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Phone</div>
+      <div class="value" id="phone">Locked</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Email</div>
+      <div class="value" id="email">Locked</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Address</div>
+      <div class="value" id="address">Locked</div>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://leadforge-llc.onrender.com";
+    const id = "e27a1c37-d7be-4d6e-b582-6f8982eecf7c";
+
+    function setMsg(text) {
+      document.getElementById("msg").innerText = text;
+    }
+
+    async function loadPreview() {
+      setMsg("Loading preview...");
+      try {
+        const res = await fetch(`${API}/leads/${id}/preview`);
+        const data = await res.json();
+
+        document.getElementById("service").innerText =
+          data.service_type || data.service || data.project_type || "—";
+        document.getElementById("zip").innerText =
+          data.zip_code || data.zip || "—";
+        document.getElementById("project").innerText =
+          data.project_description || data.project_summary || data.details || "—";
+
+        await checkStatus();
+        setMsg("Preview loaded.");
+      } catch (e) {
+        setMsg("Preview failed.");
+      }
+    }
+
+    async function checkStatus() {
+      try {
+        const res = await fetch(`${API}/leads/${id}/unlock-status`);
+        const data = await res.json();
+        document.getElementById("status").innerText =
+          data.unlocked ? "Unlocked" : "Locked";
+      } catch (e) {
+        document.getElementById("status").innerText = "Error";
+      }
+    }
+
+    async function unlockLead() {
+      setMsg("Unlocking...");
+      try {
+        await fetch(`${API}/leads/${id}/test-unlock`, { method: "POST" });
+        await checkStatus();
+        setMsg("Unlock request sent.");
+      } catch (e) {
+        setMsg("Unlock failed.");
+      }
+    }
+
+    async function loadFull() {
+      setMsg("Loading full lead...");
+      try {
+        const res = await fetch(`${API}/leads/${id}/full`);
+        const data = await res.json();
+
+        document.getElementById("name").innerText =
+          data.homeowner_name || data.name || "—";
+        document.getElementById("phone").innerText =
+          data.phone || data.phone_number || "—";
+        document.getElementById("email").innerText =
+          data.email || "—";
+        document.getElementById("address").innerText =
+          data.address || data.street_address || "—";
+
+        setMsg("Full lead loaded.");
+      } catch (e) {
+        setMsg("Full lead failed.");
+      }
+    }
+
+    loadPreview();
+  </script>
+</body>
+</html>
