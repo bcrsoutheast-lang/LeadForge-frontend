@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Unlock | LeadForge</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #111;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .locked {
+      background: #fff4e8;
+      color: #c25a00;
+    }
+
+    .unlocked {
+      background: #ebfff0;
+      color: #117a37;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .item {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .details-box {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .button {
+      display: inline-block;
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+
+    .button:hover {
+      opacity: 0.92;
+    }
+
+    .button-orange {
+      background: #ff7a00;
+      color: #fff;
+    }
+
+    .button-gray {
+      background: #ddd;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    .helper {
+      font-size: 14px;
+      color: #666;
+      margin-top: 12px;
+    }
+
+    .error {
+      color: #b00020;
+      font-weight: 700;
+    }
+
+    .success {
+      color: #117a37;
+      font-weight: 700;
+    }
+
+    .loading {
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (min-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div id="statusBadge" class="eyebrow locked">Checking lead...</div>
+      <h1>Exclusive Lead Opportunity</h1>
+      <p id="topMessage" class="loading">Loading lead information...</p>
+    </div>
+
+    <div id="leadCard" class="card hidden">
+      <h2>Lead Snapshot</h2>
+      <div class="grid">
+        <div class="item">
+          <div class="label">Lead ID</div>
+          <div id="leadId" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">Service</div>
+          <div id="service" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">City</div>
+          <div id="city" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">State</div>
+          <div id="state" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">ZIP Code</div>
+          <div id="zip" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">Submitted</div>
+          <div id="submitted" class="value">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="previewCard" class="card hidden">
+      <h2>Project Preview</h2>
+      <div id="previewText" class="details-box">—</div>
+    </div>
+
+    <div id="unlockedCard" class="card hidden">
+      <div class="eyebrow unlocked">Unlocked</div>
+      <h2>Homeowner Contact Info</h2>
+
+      <div class="grid">
+        <div class="item">
+          <div class="label">Name</div>
+          <div id="fullName" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">Phone</div>
+          <div id="fullPhone" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">Email</div>
+          <div id="fullEmail" class="value">—</div>
+        </div>
+        <div class="item">
+          <div class="label">Status</div>
+          <div id="fullStatus" class="value">Unlocked</div>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 18px;">Full Project Details</h2>
+      <div id="fullDetails" class="details-box">—</div>
+    </div>
+
+    <div id="lockedCard" class="card hidden">
+      <div class="eyebrow locked">Locked</div>
+      <h2>Unlock This Lead</h2>
+      <p>Pay the $10 unlock fee to view the homeowner’s full contact details for this exclusive request.</p>
+
+      <a
+        id="unlockButton"
+        class="button button-orange"
+        href="https://buy.stripe.com/aFaaEWfL2gzp7QF2TI4ow00"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Unlock for $10
+      </a>
+
+      <p class="helper">
+        After payment, this page will be connected to automatic unlock. For now, backend unlock is working and Stripe automation is the next step.
+      </p>
+    </div>
+
+    <div id="errorCard" class="card hidden">
+      <h2 class="error">Something went wrong</h2>
+      <p id="errorText">Unable to load this lead.</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+    const params = new URLSearchParams(window.location.search);
+    const leadIdParam = params.get("id");
+
+    const statusBadge = document.getElementById("statusBadge");
+    const topMessage = document.getElementById("topMessage");
+
+    const leadCard = document.getElementById("leadCard");
+    const previewCard = document.getElementById("previewCard");
+    const unlockedCard = document.getElementById("unlockedCard");
+    const lockedCard = document.getElementById("lockedCard");
+    const errorCard = document.getElementById("errorCard");
+    const errorText = document.getElementById("errorText");
+
+    function showError(message) {
+      statusBadge.textContent = "Error";
+      statusBadge.className = "eyebrow locked";
+      topMessage.textContent = "We could not load this lead.";
+      errorText.textContent = message;
+      errorCard.classList.remove("hidden");
+    }
+
+    function formatDate(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value || "—";
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url);
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const detail = data && data.detail ? data.detail : "Request failed";
+        throw new Error(detail);
+      }
+
+      return data;
+    }
+
+    async function loadLead() {
+      if (!leadIdParam) {
+        showError("Missing lead ID in URL. Use lead-unlock.html?id=REAL_LEAD_ID");
+        return;
+      }
+
+      try {
+        const statusData = await fetchJson(`${API_BASE}/leads/${leadIdParam}/unlock-status`);
+        const preview = statusData.preview || {};
+
+        leadCard.classList.remove("hidden");
+        previewCard.classList.remove("hidden");
+
+        setText("leadId", preview.id);
+        setText("service", preview.service);
+        setText("city", preview.city);
+        setText("state", preview.state);
+        setText("zip", preview.zip_code);
+        setText("submitted", formatDate(preview.submitted_at));
+        setText("previewText", preview.preview || "No preview available.");
+
+        if (statusData.unlocked) {
+          statusBadge.textContent = "Lead Unlocked";
+          statusBadge.className = "eyebrow unlocked";
+          topMessage.innerHTML = '<span class="success">This lead is unlocked.</span> Full homeowner info is shown below.';
+
+          const fullData = await fetchJson(`${API_BASE}/leads/${leadIdParam}/full`);
+
+          setText("fullName", fullData.name);
+          setText("fullPhone", fullData.phone);
+          setText("fullEmail", fullData.email);
+          setText("fullStatus", fullData.status);
+          setText("fullDetails", fullData.project_details || "No project details available.");
+
+          unlockedCard.classList.remove("hidden");
+          lockedCard.classList.add("hidden");
+        } else {
+          statusBadge.textContent = "Lead Locked";
+          statusBadge.className = "eyebrow locked";
+          topMessage.textContent = "This exclusive lead is still locked. Preview shown below.";
+
+          unlockedCard.classList.add("hidden");
+          lockedCard.classList.remove("hidden");
+        }
+      } catch (error) {
+        showError(error.message || "Unable to load lead");
+      }
+    }
+
+    loadLead();
+  </script>
+</body>
+</html>
