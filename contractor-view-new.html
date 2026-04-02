@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadForge | Request</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef3fb;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+    }
+
+    .msg {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2 id="contractorName">Loading...</h2>
+
+  <form id="form">
+
+    <label>Your Name</label>
+    <input id="name" />
+
+    <label>Email</label>
+    <input id="email" />
+
+    <label>Phone</label>
+    <input id="phone" />
+
+    <label>City</label>
+    <input id="city" />
+
+    <label>State</label>
+    <input id="state" />
+
+    <label>ZIP</label>
+    <input id="zip" />
+
+    <label>Details</label>
+    <textarea id="details"></textarea>
+
+    <button type="submit">Send Request</button>
+
+    <div id="msg" class="msg"></div>
+
+  </form>
+</div>
+
+<script>
+
+const API = "https://leadforge-llc.onrender.com";
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+async function load() {
+  const res = await fetch(API + "/contractors/" + id);
+  const data = await res.json();
+  document.getElementById("contractorName").innerText =
+    data.name || data.business_name || "Contractor";
+}
+
+document.getElementById("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    contractor_id: id,
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    city: document.getElementById("city").value,
+    state: document.getElementById("state").value,
+    zip: document.getElementById("zip").value,
+    details: document.getElementById("details").value
+  };
+
+  const msg = document.getElementById("msg");
+
+  try {
+    const res = await fetch(API + "/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.detail);
+
+    msg.innerText = "SUCCESS ✅";
+  } catch (err) {
+    msg.innerText = err.message;
+  }
+});
+
+load();
+
+</script>
+
+</body>
+</html>
