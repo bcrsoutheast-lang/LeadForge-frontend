@@ -1,0 +1,12 @@
+payload)
+  });
+
+  const data = await res.json();
+
+  document.getElementById("msg").innerText =
+    data.message || data.detail;
+}
+</script>
+
+</body>
+</html>
