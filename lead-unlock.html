@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadForge | Unlock Opportunity</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 32px;
+      color: #111827;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: #6b7280;
+      font-size: 15px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .status {
+      display: inline-block;
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fdba74;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .status.unlocked {
+      background: #ecfdf5;
+      color: #047857;
+      border-color: #6ee7b7;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      color: #111827;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .field {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #6b7280;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .field-value {
+      font-size: 16px;
+      color: #111827;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .details-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+
+    .details-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .details-value {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #111827;
+      word-break: break-word;
+    }
+
+    .locked-card,
+    .unlocked-card {
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .locked-card {
+      background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+      color: #ffffff;
+    }
+
+    .unlocked-card {
+      background: linear-gradient(180deg, #065f46 0%, #047857 100%);
+      color: #ffffff;
+      display: none;
+    }
+
+    .lock-title {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .lock-text {
+      margin: 0 0 18px;
+      color: #d1d5db;
+      line-height: 1.6;
+    }
+
+    .unlocked-card .lock-text {
+      color: #d1fae5;
+    }
+
+    .locked-fields,
+    .unlocked-fields {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .locked-field,
+    .unlocked-field {
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .locked-field {
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .unlocked-field {
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .locked-label,
+    .unlocked-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .locked-label {
+      color: #d1d5db;
+    }
+
+    .unlocked-label {
+      color: #d1fae5;
+    }
+
+    .locked-value,
+    .unlocked-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      word-break: break-word;
+    }
+
+    .unlock-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .price {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .price small {
+      font-size: 14px;
+      font-weight: 600;
+      color: #d1d5db;
+    }
+
+    .unlock-btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: #f97316;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+    }
+
+    .unlock-btn:hover {
+      opacity: 0.95;
+    }
+
+    .call-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .action-btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      background: #ffffff;
+      color: #065f46;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #d1d5db;
+      line-height: 1.5;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 18px;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .title {
+        font-size: 24px;
+      }
+
+      .grid,
+      .call-row {
+        grid-template-columns: 1fr;
+      }
+
+      .card,
+      .locked-card,
+      .unlocked-card {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <h1>LeadForge</h1>
+      <p>Exclusive homeowner opportunities for approved contractors</p>
+    </div>
+
+    <div id="errorBox" class="error"></div>
+
+    <div class="card">
+      <div id="statusBadge" class="status">New Exclusive Opportunity</div>
+      <h2 class="title">Homeowner Request Available</h2>
+      <p id="topSubtitle" class="subtitle">
+        A homeowner submitted a request connected to your business. Review the preview below and unlock the full contact details when you are ready to move on the opportunity.
+      </p>
+
+      <div class="grid">
+        <div class="field">
+          <div class="field-label">Lead ID</div>
+          <div class="field-value" id="leadId">Loading...</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Status</div>
+          <div class="field-value" id="leadStatus">Locked</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Submitted</div>
+          <div class="field-value" id="submittedAt">Just now</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Area</div>
+          <div class="field-value" id="leadArea">Local homeowner request</div>
+        </div>
+      </div>
+
+      <div class="details-box">
+        <div class="details-label">Request Preview</div>
+        <div class="details-value" id="previewDetails">
+          A homeowner submitted a service request. Full contact details are hidden until this opportunity is unlocked.
+        </div>
+      </div>
+    </div>
+
+    <div id="lockedCard" class="locked-card">
+      <h3 class="lock-title">Unlock Full Contact Details</h3>
+      <p class="lock-text">
+        Reveal the homeowner’s name, email, phone number, and full request details so you can contact them directly.
+      </p>
+
+      <div class="locked-fields">
+        <div class="locked-field">
+          <div class="locked-label">Homeowner Name</div>
+          <div class="locked-value">🔒 Locked until payment</div>
+        </div>
+
+        <div class="locked-field">
+          <div class="locked-label">Phone</div>
+          <div class="locked-value">🔒 Locked until payment</div>
+        </div>
+
+        <div class="locked-field">
+          <div class="locked-label">Email</div>
+          <div class="locked-value">🔒 Locked until payment</div>
+        </div>
+      </div>
+
+      <div class="unlock-box">
+        <p class="price">$10 <small>one-time unlock</small></p>
+        <a
+          id="unlockBtn"
+          class="unlock-btn"
+          href="https://buy.stripe.com/aFaaEWfL2gzp7QF2TI4ow00"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Unlock Opportunity – $10
+        </a>
+        <div class="note">
+          You will be redirected to secure Stripe checkout to complete your one-time unlock payment.
+        </div>
+      </div>
+    </div>
+
+    <div id="unlockedCard" class="unlocked-card">
+      <h3 class="lock-title">Opportunity Unlocked</h3>
+      <p class="lock-text">
+        Payment complete. You now have full homeowner contact details for this exclusive request.
+      </p>
+
+      <div class="unlocked-fields">
+        <div class="unlocked-field">
+          <div class="unlocked-label">Homeowner Name</div>
+          <div class="unlocked-value" id="fullName">Not provided</div>
+        </div>
+
+        <div class="unlocked-field">
+          <div class="unlocked-label">Phone</div>
+          <div class="unlocked-value" id="fullPhone">Not provided</div>
+        </div>
+
+        <div class="unlocked-field">
+          <div class="unlocked-label">Email</div>
+          <div class="unlocked-value" id="fullEmail">Not provided</div>
+        </div>
+
+        <div class="unlocked-field">
+          <div class="unlocked-label">Full Details</div>
+          <div class="unlocked-value" id="fullDetails">Not provided</div>
+        </div>
+      </div>
+
+      <div class="call-row">
+        <a id="callBtn" class="action-btn" href="#">Call Homeowner</a>
+        <a id="emailBtn" class="action-btn" href="#">Email Homeowner</a>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      LeadForge controls the opportunity. You do the work.
+    </div>
+  </div>
+
+  <script>
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function showError(message) {
+      const errorBox = document.getElementById("errorBox");
+      errorBox.style.display = "block";
+      errorBox.textContent = message;
+    }
+
+    function formatDate(value) {
+      if (!value) return "Just now";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
+
+    function setText(id, value, fallback) {
+      document.getElementById(id).textContent = value || fallback;
+    }
+
+    function unlockView() {
+      const name = getQueryParam("name");
+      const phone = getQueryParam("phone");
+      const email = getQueryParam("email");
+      const details = getQueryParam("details") || getQueryParam("preview");
+
+      document.getElementById("lockedCard").style.display = "none";
+      document.getElementById("unlockedCard").style.display = "block";
+
+      document.getElementById("statusBadge").textContent = "Opportunity Unlocked";
+      document.getElementById("statusBadge").classList.add("unlocked");
+      document.getElementById("leadStatus").textContent = "Unlocked";
+      document.getElementById("topSubtitle").textContent =
+        "Payment complete. Full homeowner details are now available below.";
+
+      setText("fullName", name, "Not provided");
+      setText("fullPhone", phone, "Not provided");
+      setText("fullEmail", email, "Not provided");
+      setText("fullDetails", details, "Not provided");
+
+      const callBtn = document.getElementById("callBtn");
+      const emailBtn = document.getElementById("emailBtn");
+
+      if (phone) {
+        callBtn.href = "tel:" + phone;
+      } else {
+        callBtn.removeAttribute("href");
+        callBtn.style.opacity = "0.6";
+      }
+
+      if (email) {
+        emailBtn.href = "mailto:" + email;
+      } else {
+        emailBtn.removeAttribute("href");
+        emailBtn.style.opacity = "0.6";
+      }
+    }
+
+    function initPage() {
+      const leadId = getQueryParam("id");
+      const preview = getQueryParam("preview");
+      const area = getQueryParam("area");
+      const submitted = getQueryParam("submitted");
+      const paid = getQueryParam("paid");
+
+      if (!leadId) {
+        showError("Missing lead ID in URL.");
+        document.getElementById("leadId").textContent = "Missing";
+      } else {
+        document.getElementById("leadId").textContent = leadId;
+      }
+
+      if (preview) {
+        document.getElementById("previewDetails").textContent = preview;
+      }
+
+      if (area) {
+        document.getElementById("leadArea").textContent = area;
+      }
+
+      if (submitted) {
+        document.getElementById("submittedAt").textContent = formatDate(submitted);
+      }
+
+      if (paid === "true") {
+        unlockView();
+      }
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
