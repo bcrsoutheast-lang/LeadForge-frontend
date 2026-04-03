@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homeowner Request | LeadForge LLC</title>
+  <meta
+    name="description"
+    content="Submit your homeowner project request through LeadForge and get connected through an exclusive contractor request system."
+  />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
+      color: #111;
+      line-height: 1.5;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .topbar {
+      background: #111;
+      color: #fff;
+      padding: 16px 20px;
+      border-bottom: 3px solid #d90404;
+    }
+
+    .topbar-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .brand img {
+      height: 42px;
+      width: auto;
+      display: block;
+    }
+
+    .brand span {
+      color: #d90404;
+    }
+
+    .nav {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #111 0%, #1d1d1d 55%, #2a2a2a 100%);
+      color: #fff;
+      padding: 60px 20px 40px;
+    }
+
+    .hero-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: 46px;
+      line-height: 1.08;
+    }
+
+    .hero h1 .red {
+      color: #ff1a1a;
+    }
+
+    .hero .subline {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      margin: 0 0 16px;
+      color: #ececec;
+      font-size: 18px;
+      max-width: 700px;
+    }
+
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .hero-points span {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .trust-card {
+      background: #fff;
+      color: #111;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    }
+
+    .trust-card h3 {
+      margin: 0 0 14px;
+      font-size: 25px;
+    }
+
+    .trust-card p {
+      margin: 0 0 16px;
+      color: #444;
+      font-size: 15px;
+    }
+
+    .trust-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .trust-list li {
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: #222;
+    }
+
+    .section {
+      padding: 65px 20px;
+    }
+
+    .section-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .section-title h2 {
+      margin: 0 0 10px;
+      font-size: 36px;
+    }
+
+    .section-title p {
+      margin: 0 auto;
+      max-width: 760px;
+      color: #555;
+      font-size: 17px;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .benefit-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e8e8e8;
+    }
+
+    .benefit-card .num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #d90404;
+      color: #fff;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .benefit-card h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .benefit-card p {
+      margin: 0;
+      color: #555;
+    }
+
+    .form-wrap {
+      background: #fff;
+      border-top: 1px solid #e8e8e8;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .form-shell {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e7e7e7;
+      overflow: hidden;
+    }
+
+    .form-head {
+      background: #111;
+      color: #fff;
+      padding: 28px;
+      border-bottom: 4px solid #d90404;
+    }
+
+    .form-head h2 {
+      margin: 0 0 10px;
+      font-size: 34px;
+    }
+
+    .form-head p {
+      margin: 0;
+      color: #f0f0f0;
+      font-size: 16px;
+    }
+
+    .form-body {
+      padding: 28px;
+    }
+
+    .alert {
+      background: #fff5f5;
+      border: 1px solid #ffc9c9;
+      color: #8f1111;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 22px;
+      font-weight: 700;
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #111;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 14px;
+      border: 1px solid #cfcfcf;
+      border-radius: 12px;
+      font-size: 16px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fff;
+      color: #111;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #d90404;
+      box-shadow: 0 0 0 3px rgba(217, 4, 4, 0.12);
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .helper {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 20px;
+      background: #d90404;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: #b70000;
+    }
+
+    .status {
+      margin-top: 18px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .how-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #e7e7e7;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .how-card h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .how-card p {
+      margin: 0;
+      color: #555;
+    }
+
+    .footer {
+      background: #111;
+      color: #ddd;
+      padding: 28px 20px;
+    }
+
+    .footer-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .footer strong {
+      color: #fff;
+    }
+
+    @media (max-width: 920px) {
+      .hero-inner,
+      .benefits-grid,
+      .how-grid,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 38px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .brand {
+        font-size: 24px;
+      }
+
+      .brand img {
+        height: 36px;
+      }
+
+      .hero {
+        padding: 46px 20px 30px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero .subline {
+        font-size: 18px;
+      }
+
+      .section-title h2,
+      .form-head h2 {
+        font-size: 29px;
+      }
+
+      .form-head,
+      .form-body,
+      .trust-card,
+      .benefit-card,
+      .how-card {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="logo.png" alt="LeadForge logo" />
+        <div>Lead<span>Forge</span> LLC</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="#request-form">Request Form</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="contractors.html">Contractors</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <h1>Request a <span class="red">Vetted Contractor</span> Without the Chaos</h1>
+        <div class="subline">One request. Not blasted to multiple contractors.</div>
+        <p>
+          LeadForge connects homeowners with vetted, qualified contractors through an
+          exclusive request system designed to cut out spam, confusion, and bidding wars.
+        </p>
+        <p>
+          You submit one project request. We do not blast your information out to a crowd
+          of competing contractors.
+        </p>
+        <div class="hero-points">
+          <span>Exclusive request system</span>
+          <span>No contractor bidding war</span>
+          <span>Vetted professionals only</span>
+          <span>Built for serious projects</span>
+        </div>
+      </div>
+
+      <div class="trust-card">
+        <h3>Why homeowners will like this</h3>
+        <p>
+          LeadForge is built to create a cleaner homeowner experience from the start.
+        </p>
+        <ul class="trust-list">
+          <li>Your project request is not sent into a contractor free-for-all</li>
+          <li>You avoid the race-to-the-bottom pricing game</li>
+          <li>Contractors are screened before they receive access</li>
+          <li>The system is built for confidence, clarity, and real projects</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-title">
+        <h2>A Better Way to Request a Contractor</h2>
+        <p>
+          Instead of being overwhelmed by multiple competing contractors, LeadForge is
+          designed around a more controlled and professional request flow.
+        </p>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="num">1</div>
+          <h3>One Request</h3>
+          <p>
+            Submit your project details once through a clean homeowner form.
+          </p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="num">2</div>
+          <h3>Exclusive Flow</h3>
+          <p>
+            Your request is handled through an exclusive opportunity model, not a shared blast.
+          </p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="num">3</div>
+          <h3>Vetted Contractors</h3>
+          <p>
+            Contractors are expected to meet professional standards before access is granted.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section form-wrap" id="request-form">
+    <div class="section-inner">
+      <div class="form-shell">
+        <div class="form-head">
+          <h2>Homeowner Project Request</h2>
+          <p>
+            Fill out your request below. The more clearly you describe your project, the
+            better the opportunity can be matched and reviewed.
+          </p>
+        </div>
+
+        <div class="form-body">
+          <div class="alert">
+            Your request is designed to go through an exclusive contractor opportunity system —
+            not a shared bidding war.
+          </div>
+
+          <form id="homeownerForm">
+            <div class="grid-2">
+              <div>
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" required />
+              </div>
+
+              <div>
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+
+              <div>
+                <label for="service_needed">Service Needed</label>
+                <select id="service_needed" name="service_needed" required>
+                  <option value="">Select a service</option>
+                  <option>Roofing</option>
+                  <option>HVAC</option>
+                  <option>Siding</option>
+                  <option>Decks</option>
+                  <option>Fencing</option>
+                  <option>Soft Wash</option>
+                  <option>Exterior Repair</option>
+                  <option>General Home Project</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div>
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" required />
+              </div>
+
+              <div>
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" required />
+              </div>
+            </div>
+
+            <div>
+              <label for="zip_code">Zip Code</label>
+              <input type="text" id="zip_code" name="zip_code" required />
+            </div>
+
+            <div>
+              <label for="project_details">Describe Your Project</label>
+              <textarea
+                id="project_details"
+                name="project_details"
+                placeholder="Tell us what you need done, the type of property, timing, and anything important a contractor should know."
+                required
+              ></textarea>
+              <div class="helper">
+                Example: roof replacement, fence install, siding repair, deck build, pressure wash, HVAC issue, or other home project details.
+              </div>
+            </div>
+
+            <button type="submit" class="btn">Submit My Exclusive Request</button>
+            <div id="statusMessage" class="status"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works">
+    <div class="section-inner">
+      <div class="section-title">
+        <h2>How the Homeowner Side Works</h2>
+        <p>
+          LeadForge is built to create a smoother and more controlled project request experience.
+        </p>
+      </div>
+
+      <div class="how-grid">
+        <div class="how-card">
+          <h3>Submit Your Request</h3>
+          <p>
+            You provide your project details once through the homeowner request form.
+          </p>
+        </div>
+
+        <div class="how-card">
+          <h3>Request Is Protected</h3>
+          <p>
+            The system is built around protected project opportunity handling instead of mass lead sharing.
+          </p>
+        </div>
+
+        <div class="how-card">
+          <h3>Qualified Contractor Access</h3>
+          <p>
+            Contractors are expected to be vetted and positioned to receive access through the LeadForge flow.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <strong>LeadForge LLC</strong><br />
+      Exclusive homeowner requests. Vetted contractor opportunities.
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("homeownerForm");
+    const statusMessage = document.getElementById("statusMessage");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      statusMessage.style.color = "#111";
+      statusMessage.textContent = "Submitting your request...";
+
+      const payload = {
+        full_name: document.getElementById("full_name").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        city: document.getElementById("city").value,
+        state: document.getElementById("state").value,
+        zip_code: document.getElementById("zip_code").value,
+        service_needed: document.getElementById("service_needed").value,
+        project_details: document.getElementById("project_details").value
+      };
+
+      try {
+        const response = await fetch("https://leadforge-llc.onrender.com/leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+
+        statusMessage.style.color = "green";
+        statusMessage.textContent = "Success — your project request has been submitted.";
+        form.reset();
+      } catch (error) {
+        statusMessage.style.color = "#b00020";
+        statusMessage.textContent = "Something went wrong submitting your request. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
