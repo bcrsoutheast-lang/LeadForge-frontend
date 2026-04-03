@@ -1,0 +1,4 @@
+<div class="brand" style="display:flex;align-items:center;gap:10px;">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" style="height:40px;" />
+  <div>Lead<span style="color:red;">Forge</span> LLC</div>
+</div>
