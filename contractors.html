@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join LeadForge | Contractor Network</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f7f8fc;
+}
+
+header {
+  background: #0f172a;
+  color: white;
+  padding: 15px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  margin: 0;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: #dc2626;
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  width: 100%;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #aaa;
+}
+
+.disclaimer {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  padding: 18px;
+  border-radius: 10px;
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.checkbox-row {
+  margin-top: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: auto;
+  margin: 3px 0 0 0;
+}
+
+.terms-link {
+  font-size: 13px;
+  margin-top: 8px;
+  margin-bottom: 18px;
+}
+
+.terms-link a {
+  color: #dc2626;
+  text-decoration: underline;
+}
+
+.status {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  display: none;
+}
+
+.success {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <h1>LeadForge Contractors</h1>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Apply to Join LeadForge</h2>
+    <p>Join the network where homeowners browse and choose contractors directly.</p>
+
+    <form id="form">
+
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="text" id="business" placeholder="Business Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="text" id="phone" placeholder="Phone" required>
+
+      <select id="trade" required>
+        <option value="">Select Trade</option>
+        <option>Roofing</option>
+        <option>HVAC</option>
+        <option>Painting</option>
+        <option>Fencing</option>
+        <option>Remodeling</option>
+      </select>
+
+      <input type="text" id="city" placeholder="City" required>
+      <input type="text" id="state" placeholder="State" required>
+
+      <textarea id="bio" placeholder="Short description of your business"></textarea>
+
+      <div class="disclaimer">
+        <strong>Important — How LeadForge Works</strong><br><br>
+
+        LeadForge is a platform that connects homeowners with contractors they choose.<br><br>
+
+        Contractors do not pay to join the platform. Instead, when a homeowner submits a request and you are the selected contractor, you may be given the option to unlock full project details.<br><br>
+
+        Unlocking a request is a one-time access fee that allows you to view the homeowner’s full information and pursue the opportunity.<br><br>
+
+        LeadForge does not guarantee that any unlocked request will result in a job, contract, or payment. Contractors are responsible for their own pricing, agreements, and project outcomes.
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="agree" required>
+        <label for="agree">I understand how LeadForge works and agree to the terms</label>
+      </div>
+
+      <div class="terms-link">
+        <a href="https://lead-forge-frontend.vercel.app/terms.html" target="_blank" rel="noopener noreferrer">View full Terms of Service</a>
+      </div>
+
+      <button id="submitBtn" type="submit">Submit Application</button>
+
+      <div id="status" class="status"></div>
+
+    </form>
+  </div>
+
+</div>
+
+<script>
+const form = document.getElementById("form");
+const statusDiv = document.getElementById("status");
+const btn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  btn.disabled = true;
+  btn.innerText = "Submitting...";
+
+  const data = {
+    name: document.getElementById("name").value.trim(),
+    business_name: document.getElementById("business").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    trade: document.getElementById("trade").value.trim(),
+    city: document.getElementById("city").value.trim(),
+    state: document.getElementById("state").value.trim(),
+    bio: document.getElementById("bio").value.trim()
+  };
+
+  try {
+    const res = await fetch("https://leadforge-llc.onrender.com/contractors", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) throw new Error("Submission failed");
+
+    statusDiv.className = "status success";
+    statusDiv.style.display = "block";
+    statusDiv.innerText = "Application submitted successfully!";
+
+    form.reset();
+  } catch (err) {
+    statusDiv.className = "status error";
+    statusDiv.style.display = "block";
+    statusDiv.innerText = "Error submitting application. Try again.";
+  }
+
+  btn.disabled = false;
+  btn.innerText = "Submit Application";
+});
+</script>
+
+</body>
+</html>
