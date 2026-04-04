@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find a Contractor | LeadForge</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .header {
+      background: #111827;
+      color: white;
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .header p {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .top-link {
+      margin-bottom: 18px;
+    }
+
+    .top-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .section-title {
+      font-size: 26px;
+      margin: 0 0 8px;
+    }
+
+    .section-subtitle {
+      margin: 0 0 24px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .status-box {
+      display: none;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .status-success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .status-error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .loading-box,
+    .empty-box {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .contractor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .contractor-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .contractor-card:hover {
+      transform: translateY(-2px);
+      border-color: #9ca3af;
+    }
+
+    .contractor-card.selected {
+      border-color: #dc2626;
+      box-shadow: 0 10px 28px rgba(220, 38, 38, 0.18);
+    }
+
+    .contractor-name {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .contractor-meta {
+      margin-bottom: 6px;
+      font-size: 15px;
+      color: #374151;
+    }
+
+    .selected-banner {
+      display: none;
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #9a3412;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 22px;
+      font-weight: bold;
+    }
+
+    .form-wrap {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-wrap h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .form-wrap p {
+      margin-top: 0;
+      margin-bottom: 18px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    input,
+    select,
+    textarea {
+      border: 1px solid #d1d5db;
+      padding: 13px 14px;
+      margin-bottom: 14px;
+      background: white;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      background: #dc2626;
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #b91c1c;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .small-note {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 700px) {
+      .header h1 {
+        font-size: 26px;
+      }
+
+      .section-title {
+        font-size: 22px;
+      }
+
+      .form-wrap,
+      .contractor-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Find a Contractor</h1>
+    <p>Browse available contractors, choose who you want, and send one direct project request.</p>
+  </div>
+
+  <div class="container">
+    <div class="top-link">
+      <a href="/">← Back to Home</a>
+    </div>
+
+    <h2 class="section-title">Browse Contractors</h2>
+    <p class="section-subtitle">
+      Select one contractor below. Your request will be tied to the contractor you choose.
+    </p>
+
+    <div id="messageBox" class="status-box"></div>
+
+    <div id="loadingBox" class="loading-box">Loading contractors...</div>
+    <div id="emptyBox" class="empty-box" style="display:none;">No contractors found yet.</div>
+
+    <div id="contractorGrid" class="contractor-grid" style="display:none;"></div>
+
+    <div id="selectedBanner" class="selected-banner"></div>
+
+    <div class="form-wrap">
+      <h3>Submit Your Project Request</h3>
+      <p>Fill out your project details after choosing a contractor.</p>
+
+      <form id="leadForm">
+        <input type="text" id="name" placeholder="Your Full Name" required />
+        <input type="text" id="phone" placeholder="Phone Number" required />
+        <input type="email" id="email" placeholder="Email Address" required />
+        <input type="text" id="city" placeholder="City" required />
+        <input type="text" id="state" placeholder="State" required />
+        <input type="text" id="zip_code" placeholder="ZIP Code" required />
+
+        <select id="service" required>
+          <option value="">Select Service Type</option>
+          <option>Roofing</option>
+          <option>HVAC</option>
+          <option>Painting</option>
+          <option>Fencing</option>
+          <option>Remodeling</option>
+          <option>General Repair</option>
+        </select>
+
+        <textarea id="project_details" placeholder="Describe your project" required></textarea>
+
+        <button type="submit" id="submitBtn">Submit Request</button>
+
+        <div class="small-note">
+          Your request is sent based on the contractor you selected above.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const contractorGrid = document.getElementById("contractorGrid");
+    const loadingBox = document.getElementById("loadingBox");
+    const emptyBox = document.getElementById("emptyBox");
+    const selectedBanner = document.getElementById("selectedBanner");
+    const messageBox = document.getElementById("messageBox");
+    const leadForm = document.getElementById("leadForm");
+    const submitBtn = document.getElementById("submitBtn");
+
+    let selectedContractor = null;
+
+    function showMessage(type, text) {
+      messageBox.className = "status-box";
+      if (type === "success") {
+        messageBox.classList.add("status-success");
+      } else {
+        messageBox.classList.add("status-error");
+      }
+      messageBox.textContent = text;
+      messageBox.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clearMessage() {
+      messageBox.style.display = "none";
+      messageBox.textContent = "";
+    }
+
+    function safeValue(value, fallback = "—") {
+      if (value === null || value === undefined || String(value).trim() === "") {
+        return fallback;
+      }
+      return String(value);
+    }
+
+    function selectContractor(contractor, cardElement) {
+      selectedContractor = contractor;
+
+      document.querySelectorAll(".contractor-card").forEach((card) => {
+        card.classList.remove("selected");
+      });
+
+      cardElement.classList.add("selected");
+
+      const businessName = safeValue(contractor.business_name, "Selected Contractor");
+      const trade = safeValue(contractor.trade, "Service");
+      const area = safeValue(contractor.service_area, "Area");
+
+      selectedBanner.style.display = "block";
+      selectedBanner.textContent = `Selected: ${businessName} | ${trade} | ${area}`;
+    }
+
+    async function loadContractors() {
+      clearMessage();
+      loadingBox.style.display = "block";
+      contractorGrid.style.display = "none";
+      emptyBox.style.display = "none";
+      contractorGrid.innerHTML = "";
+
+      try {
+        const response = await fetch(`${API_BASE}/contractors`);
+        const data = await response.json();
+
+        loadingBox.style.display = "none";
+
+        if (!Array.isArray(data) || data.length === 0) {
+          emptyBox.style.display = "block";
+          return;
+        }
+
+        data.forEach((contractor) => {
+          const card = document.createElement("div");
+          card.className = "contractor-card";
+
+          card.innerHTML = `
+            <div class="contractor-name">${safeValue(contractor.business_name)}</div>
+            <div class="contractor-meta"><strong>Contact:</strong> ${safeValue(contractor.contact_name)}</div>
+            <div class="contractor-meta"><strong>Trade:</strong> ${safeValue(contractor.trade)}</div>
+            <div class="contractor-meta"><strong>Area:</strong> ${safeValue(contractor.service_area)}</div>
+            <div class="contractor-meta"><strong>Phone:</strong> ${safeValue(contractor.phone)}</div>
+            <div class="contractor-meta"><strong>Email:</strong> ${safeValue(contractor.email)}</div>
+          `;
+
+          card.addEventListener("click", () => {
+            selectContractor(contractor, card);
+          });
+
+          contractorGrid.appendChild(card);
+        });
+
+        contractorGrid.style.display = "grid";
+      } catch (error) {
+        loadingBox.style.display = "none";
+        showMessage("error", "Could not load contractors.");
+      }
+    }
+
+    leadForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      clearMessage();
+
+      if (!selectedContractor) {
+        showMessage("error", "Please choose a contractor before submitting your request.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      const payload = {
+        name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        city: document.getElementById("city").value.trim(),
+        state: document.getElementById("state").value.trim(),
+        zip_code: document.getElementById("zip_code").value.trim(),
+        service: document.getElementById("service").value.trim(),
+        project_details: document.getElementById("project_details").value.trim(),
+        contractor_id: selectedContractor.id || null,
+        contractor_name: selectedContractor.business_name || ""
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/leads`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.success === false) {
+          throw new Error(result.error || "Could not submit request.");
+        }
+
+        showMessage("success", "Your request was submitted successfully.");
+        leadForm.reset();
+      } catch (error) {
+        showMessage("error", error.message || "Could not submit request.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Request";
+      }
+    });
+
+    loadContractors();
+  </script>
+</body>
+</html>
