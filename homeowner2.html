@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadForge Homeowner Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #111;
+    }
+
+    .wrap {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 12px;
+      border: 1px solid #d0d0d0;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 22px;
+      padding: 14px;
+      border: none;
+      background: #111;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .status.success {
+      display: block;
+      background: #e8f7ec;
+      color: #166534;
+      border: 1px solid #b7e4c7;
+    }
+
+    .status.error {
+      display: block;
+      background: #fdecec;
+      color: #991b1b;
+      border: 1px solid #f5b5b5;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #666;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Homeowner Lead Test</h1>
+    <p>
+      This is the simple test page to verify lead submission is working end-to-end.
+    </p>
+
+    <form id="leadForm">
+      <label for="homeowner_name">Your Name</label>
+      <input type="text" id="homeowner_name" name="homeowner_name" required />
+
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" name="phone" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="city">City</label>
+      <input type="text" id="city" name="city" />
+
+      <label for="state">State</label>
+      <input type="text" id="state" name="state" />
+
+      <label for="zip_code">Zip Code</label>
+      <input type="text" id="zip_code" name="zip_code" />
+
+      <label for="service">Service Needed</label>
+      <input type="text" id="service" name="service" placeholder="Roofing, HVAC, Plumbing, etc." />
+
+      <label for="project_details">Project Details</label>
+      <textarea id="project_details" name="project_details" placeholder="Describe the project..."></textarea>
+
+      <label for="contractor_id">Choose Contractor</label>
+      <select id="contractor_id" name="contractor_id">
+        <option value="">Loading contractors...</option>
+      </select>
+
+      <div class="small" id="contractorNote"></div>
+
+      <button type="submit" id="submitBtn">Submit Lead</button>
+    </form>
+
+    <div id="statusBox" class="status"></div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const leadForm = document.getElementById("leadForm");
+    const contractorSelect = document.getElementById("contractor_id");
+    const contractorNote = document.getElementById("contractorNote");
+    const submitBtn = document.getElementById("submitBtn");
+    const statusBox = document.getElementById("statusBox");
+
+    let contractors = [];
+
+    function showStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = "status " + type;
+    }
+
+    function clearStatus() {
+      statusBox.textContent = "";
+      statusBox.className = "status";
+    }
+
+    async function loadContractors() {
+      try {
+        const response = await fetch(`${API_BASE}/contractors`);
+        if (!response.ok) {
+          throw new Error(`Contractors request failed: ${response.status}`);
+        }
+
+        contractors = await response.json();
+
+        contractorSelect.innerHTML = '<option value="">Select a contractor</option>';
+
+        if (!Array.isArray(contractors) || contractors.length === 0) {
+          contractorSelect.innerHTML = '<option value="">No approved contractors found</option>';
+          contractorNote.textContent = "No approved contractors are available yet.";
+          return;
+        }
+
+        contractors.forEach((contractor) => {
+          const option = document.createElement("option");
+          option.value = contractor.id;
+
+          const company = contractor.company_name || "Unnamed Contractor";
+          const service = contractor.service_type || "";
+          const city = contractor.city || "";
+
+          option.textContent = [company, service, city].filter(Boolean).join(" - ");
+          option.dataset.companyName = company;
+
+          contractorSelect.appendChild(option);
+        });
+
+        contractorNote.textContent = `${contractors.length} approved contractor(s) loaded.`;
+      } catch (error) {
+        console.error(error);
+        contractorSelect.innerHTML = '<option value="">Could not load contractors</option>';
+        contractorNote.textContent = "Contractor list failed to load.";
+      }
+    }
+
+    leadForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearStatus();
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const selectedOption = contractorSelect.options[contractorSelect.selectedIndex];
+        const contractorId = contractorSelect.value;
+        const contractorName = contractorId
+          ? (selectedOption.dataset.companyName || "")
+          : "";
+
+        const payload = {
+          homeowner_name: document.getElementById("homeowner_name").value.trim(),
+          phone: document.getElementById("phone").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          city: document.getElementById("city").value.trim(),
+          state: document.getElementById("state").value.trim(),
+          zip_code: document.getElementById("zip_code").value.trim(),
+          service: document.getElementById("service").value.trim(),
+          project_details: document.getElementById("project_details").value.trim(),
+          contractor_id: contractorId,
+          contractor_name: contractorName
+        };
+
+        const response = await fetch(`${API_BASE}/leads`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.detail || "Error submitting");
+        }
+
+        showStatus(
+          `Lead submitted successfully. Lead ID: ${result.lead_id || "created"}`,
+          "success"
+        );
+
+        leadForm.reset();
+
+        if (contractors.length > 0) {
+          contractorSelect.innerHTML = '<option value="">Select a contractor</option>';
+          contractors.forEach((contractor) => {
+            const option = document.createElement("option");
+            option.value = contractor.id;
+
+            const company = contractor.company_name || "Unnamed Contractor";
+            const service = contractor.service_type || "";
+            const city = contractor.city || "";
+
+            option.textContent = [company, service, city].filter(Boolean).join(" - ");
+            option.dataset.companyName = company;
+
+            contractorSelect.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        showStatus(error.message || "Error submitting", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Lead";
+      }
+    });
+
+    loadContractors();
+  </script>
+</body>
+</html>
