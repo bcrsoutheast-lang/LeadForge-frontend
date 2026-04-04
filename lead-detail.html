@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Details | LeadForge</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 32px;
+    }
+
+    .success {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #137333;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .box {
+      background: #fafafa;
+      border: 1px solid #ececec;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .box.full {
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .status {
+      margin-top: 18px;
+      color: #444;
+      font-size: 15px;
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="success">Lead Access</div>
+      <h1>Full Lead Details</h1>
+      <div class="status" id="status">Verifying payment...</div>
+
+      <div class="grid" id="leadGrid" style="display:none;">
+        <div class="box">
+          <div class="label">Homeowner Name</div>
+          <div class="value" id="homeownerName"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">Chosen Contractor</div>
+          <div class="value" id="contractorName"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">Phone</div>
+          <div class="value" id="phone"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">Email</div>
+          <div class="value" id="email"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">City</div>
+          <div class="value" id="city"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">State</div>
+          <div class="value" id="state"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">Zip Code</div>
+          <div class="value" id="zipCode"></div>
+        </div>
+
+        <div class="box">
+          <div class="label">Service</div>
+          <div class="value" id="service"></div>
+        </div>
+
+        <div class="box full">
+          <div class="label">Project Details</div>
+          <div class="value" id="projectDetails"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get("id");
+    const sessionId = params.get("session_id");
+
+    const statusEl = document.getElementById("status");
+    const leadGrid = document.getElementById("leadGrid");
+
+    async function verifyAndLoad() {
+      if (!leadId) {
+        statusEl.textContent = "Missing lead ID.";
+        return;
+      }
+
+      try {
+        if (sessionId) {
+          const verifyRes = await fetch(
+            `${API_BASE}/verify-unlock?lead_id=${encodeURIComponent(leadId)}&session_id=${encodeURIComponent(sessionId)}`
+          );
+          const verifyData = await verifyRes.json();
+
+          if (!verifyRes.ok) {
+            throw new Error(verifyData.detail || "Payment verification failed");
+          }
+
+          if (!verifyData.unlocked) {
+            statusEl.textContent = verifyData.message || "Payment not completed.";
+            return;
+          }
+        }
+
+        const res = await fetch(`${API_BASE}/leads/${leadId}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || "Failed to load lead details");
+        }
+
+        if (!data.unlocked) {
+          statusEl.innerHTML = `This lead is not unlocked yet. <a href="unlock.html?id=${leadId}">Go to unlock page</a>`;
+          return;
+        }
+
+        document.getElementById("homeownerName").textContent = data.homeowner_name || "";
+        document.getElementById("contractorName").textContent = data.contractor_name || "";
+        document.getElementById("phone").textContent = data.phone || "";
+        document.getElementById("email").textContent = data.email || "";
+        document.getElementById("city").textContent = data.city || "";
+        document.getElementById("state").textContent = data.state || "";
+        document.getElementById("zipCode").textContent = data.zip_code || "";
+        document.getElementById("service").textContent = data.service || "";
+        document.getElementById("projectDetails").textContent = data.project_details || "";
+
+        statusEl.textContent = "Payment verified. Full lead access unlocked.";
+        leadGrid.style.display = "grid";
+      } catch (err) {
+        statusEl.textContent = err.message || "Something went wrong.";
+      }
+    }
+
+    verifyAndLoad();
+  </script>
+</body>
+</html>
