@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unlock Lead | LeadForge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #111;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .row {
+      margin-bottom: 12px;
+    }
+
+    .label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #666;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .value {
+      font-size: 16px;
+      color: #111;
+      word-break: break-word;
+    }
+
+    .hidden-value {
+      color: #999;
+      font-style: italic;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      margin-top: 22px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #111;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.error {
+      background: #fdecec;
+      color: #991b1b;
+      border: 1px solid #f5b5b5;
+    }
+
+    .status.success {
+      background: #e8f7ec;
+      color: #166534;
+      border: 1px solid #b7e4c7;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 18px;
+      color: #0b57d0;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .price-box {
+      margin-top: 18px;
+      background: #111;
+      color: #fff;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .price {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 6px 0 2px;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #d6d6d6;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Unlock This Lead</h1>
+    <p>
+      Review the opportunity below. To view the homeowner’s full contact details,
+      unlock this lead for a one-time access fee.
+    </p>
+
+    <div id="statusBox" class="status"></div>
+
+    <div class="card">
+      <div class="row">
+        <span class="label">Chosen Contractor</span>
+        <div class="value" id="contractor_name">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Service Needed</span>
+        <div class="value" id="service">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Project Details</span>
+        <div class="value" id="project_details">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Location</span>
+        <div class="value" id="location">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Homeowner Name</span>
+        <div class="value hidden-value">Hidden until unlocked</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Phone</span>
+        <div class="value hidden-value">Hidden until unlocked</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Email</span>
+        <div class="value hidden-value">Hidden until unlocked</div>
+      </div>
+    </div>
+
+    <div class="price-box">
+      <div>Lead Access</div>
+      <div class="price">$10</div>
+      <div class="small">One-time unlock to view full homeowner details.</div>
+    </div>
+
+    <button id="unlockBtn" class="btn">Unlock for $10</button>
+
+    <a class="back-link" href="/admin.html">Back to Admin</a>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const statusBox = document.getElementById("statusBox");
+    const unlockBtn = document.getElementById("unlockBtn");
+
+    const contractorNameEl = document.getElementById("contractor_name");
+    const serviceEl = document.getElementById("service");
+    const projectDetailsEl = document.getElementById("project_details");
+    const locationEl = document.getElementById("location");
+
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get("id");
+    const canceled = params.get("canceled");
+
+    function showStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = "status show " + type;
+    }
+
+    function formatLocation(city, state, zip) {
+      return [city, state, zip].filter(Boolean).join(", ") || "Not provided";
+    }
+
+    async function loadLead() {
+      if (!leadId) {
+        showStatus("Missing lead ID in the URL.", "error");
+        unlockBtn.disabled = true;
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/leads/${leadId}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.detail || "Could not load lead");
+        }
+
+        contractorNameEl.textContent = result.contractor_name || "Not assigned";
+        serviceEl.textContent = result.service || "Not provided";
+        projectDetailsEl.textContent = result.project_details || "Not provided";
+        locationEl.textContent = formatLocation(result.city, result.state, result.zip_code);
+
+        if (result.unlocked) {
+          showStatus("This lead is already unlocked.", "success");
+          unlockBtn.textContent = "View Full Lead Details";
+          unlockBtn.onclick = function () {
+            window.location.href = `/lead-detail.html?id=${encodeURIComponent(leadId)}`;
+          };
+          return;
+        }
+
+        unlockBtn.onclick = createCheckout;
+      } catch (error) {
+        console.error(error);
+        showStatus(error.message || "Could not load lead", "error");
+        unlockBtn.disabled = true;
+      }
+    }
+
+    async function createCheckout() {
+      try {
+        unlockBtn.disabled = true;
+        unlockBtn.textContent = "Redirecting...";
+
+        const response = await fetch(`${API_BASE}/create-checkout-session`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ lead_id: leadId })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.detail || "Could not start checkout");
+        }
+
+        if (!result.url) {
+          throw new Error("No checkout URL returned");
+        }
+
+        window.location.href = result.url;
+      } catch (error) {
+        console.error(error);
+        showStatus(error.message || "Could not start checkout", "error");
+        unlockBtn.disabled = false;
+        unlockBtn.textContent = "Unlock for $10";
+      }
+    }
+
+    if (canceled === "1") {
+      showStatus("Checkout canceled. You can try again whenever you're ready.", "error");
+    }
+
+    loadLead();
+  </script>
+</body>
+</html>
