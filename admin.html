@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadForge Admin</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .section {
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #111;
+      color: #fff;
+    }
+
+    button {
+      padding: 6px 10px;
+      cursor: pointer;
+      border: none;
+      background: #111;
+      color: #fff;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>LeadForge Admin</h1>
+
+  <div class="section">
+    <h2>Contractors</h2>
+    <table id="contractorsTable">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Service</th>
+          <th>City</th>
+          <th>Approved</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Leads</h2>
+    <table id="leadsTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Service</th>
+          <th>Details</th>
+          <th>Contractor</th>
+          <th>Unlocked</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+const API = "https://leadforge-llc.onrender.com";
+
+// LOAD CONTRACTORS
+async function loadContractors() {
+  const res = await fetch(API + "/admin");
+  const html = await res.text();
+
+  // quick hack to extract contractor rows from backend admin page
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const rows = doc.querySelectorAll("table tbody")[0].querySelectorAll("tr");
+  const tbody = document.querySelector("#contractorsTable tbody");
+  tbody.innerHTML = "";
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${cells[1]?.innerText || ""}</td>
+      <td>${cells[5]?.innerText || ""}</td>
+      <td>${cells[6]?.innerText || ""}</td>
+      <td>${cells[9]?.innerText || ""}</td>
+      <td>Handled in backend</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// LOAD LEADS
+async function loadLeads() {
+  const res = await fetch(API + "/admin");
+  const html = await res.text();
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const rows = doc.querySelectorAll("table tbody")[1].querySelectorAll("tr");
+  const tbody = document.querySelector("#leadsTable tbody");
+  tbody.innerHTML = "";
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${cells[2]?.innerText || ""}</td>
+      <td>${cells[3]?.innerText || ""}</td>
+      <td>${cells[4]?.innerText || ""}</td>
+      <td>${cells[8]?.innerText || ""}</td>
+      <td>${cells[9]?.innerText || ""}</td>
+      <td>${cells[10]?.innerText || ""}</td>
+      <td>${cells[12]?.innerText || ""}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// INIT
+loadContractors();
+loadLeads();
+</script>
+
+</body>
+</html>
