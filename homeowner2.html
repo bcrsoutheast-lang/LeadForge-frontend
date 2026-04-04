@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Choose Your Contractor | LeadForge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f2f2f2;
+      color: #111;
+    }
+
+    .hero {
+      background: #000;
+      color: #fff;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px 0;
+      font-size: 52px;
+      line-height: 1.05;
+      font-weight: 700;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+    }
+
+    .notice {
+      background: #f7ebc7;
+      border: 2px solid #f0cf6a;
+      border-radius: 18px;
+      padding: 20px 24px;
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 24px;
+    }
+
+    .contractor {
+      background: #fff;
+      border: 2px solid #d7d7d7;
+      border-radius: 18px;
+      padding: 26px;
+      margin-bottom: 22px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+
+    .contractor:hover {
+      border-color: #999;
+    }
+
+    .contractor.selected {
+      border-color: #111;
+      background: #f8f8f8;
+      transform: scale(1.01);
+    }
+
+    .contractor strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .contractor .meta {
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    .form-wrap {
+      background: #f7f7f7;
+      border-radius: 22px;
+      padding: 26px 22px 30px;
+      margin-top: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      border: 2px solid #9d9d9d;
+      border-radius: 12px;
+      font-size: 22px;
+      background: #fff;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 20px;
+      border: none;
+      border-radius: 0;
+      background: #ff120c;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 18px;
+      font-size: 18px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .debug {
+      margin-top: 20px;
+      font-size: 14px;
+      background: #000;
+      color: #00ff66;
+      padding: 14px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    a {
+      color: #0b57d0;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>Choose Your<br>Contractor</h1>
+    <p>HOMEOWNER TEST V2</p>
+  </div>
+
+  <div class="container">
+    <div class="notice">DEBUG: homeowner2.html live</div>
+
+    <div id="contractorList">Loading contractors...</div>
+
+    <div class="form-wrap">
+      <form id="leadForm">
+        <input id="name" type="text" placeholder="Your Name" required />
+        <input id="phone" type="text" placeholder="Phone" required />
+        <input id="email" type="email" placeholder="Email" required />
+
+        <input id="city" type="text" placeholder="City" required />
+        <input id="state" type="text" placeholder="State" required />
+        <input id="zip" type="text" placeholder="ZIP Code" required />
+
+        <select id="service" required>
+          <option value="">Select Service</option>
+          <option value="Roofing">Roofing</option>
+          <option value="Siding">Siding</option>
+          <option value="Fencing">Fencing</option>
+          <option value="HVAC">HVAC</option>
+          <option value="Painting">Painting</option>
+          <option value="Flooring">Flooring</option>
+          <option value="Bathroom Remodel">Bathroom Remodel</option>
+          <option value="Kitchen Remodel">Kitchen Remodel</option>
+          <option value="Windows">Windows</option>
+          <option value="Concrete">Concrete</option>
+          <option value="Decks">Decks</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <textarea id="details" placeholder="Project Details" required></textarea>
+
+        <button id="submitBtn" type="submit">Submit Request</button>
+
+        <div class="status" id="status"></div>
+        <div class="debug" id="debug"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://leadforge-llc.onrender.com";
+    let selectedContractor = null;
+
+    function safeText(value) {
+      return value ? String(value) : "";
+    }
+
+    async function loadContractors() {
+      const list = document.getElementById("contractorList");
+      list.innerHTML = "Loading contractors...";
+
+      try {
+        const res = await fetch(API + "/contractors");
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || "Could not load contractors");
+        }
+
+        if (!Array.isArray(data) || data.length === 0) {
+          list.innerHTML = "No approved contractors available right now.";
+          return;
+        }
+
+        list.innerHTML = "";
+
+        data.forEach((c) => {
+          const div = document.createElement("div");
+          div.className = "contractor";
+          div.innerHTML = `
+            <strong>${safeText(c.company_name)}</strong>
+            <div class="meta">${safeText(c.service_type)}<br>${safeText(c.city)}</div>
+          `;
+
+          div.addEventListener("click", () => {
+            document.querySelectorAll(".contractor").forEach((el) => {
+              el.classList.remove("selected");
+            });
+            div.classList.add("selected");
+            selectedContractor = c;
+          });
+
+          list.appendChild(div);
+        });
+      } catch (err) {
+        list.innerHTML = "Error loading contractors";
+      }
+    }
+
+    document.getElementById("leadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const status = document.getElementById("status");
+      const debug = document.getElementById("debug");
+      const submitBtn = document.getElementById("submitBtn");
+
+      status.innerHTML = "";
+
+      if (!selectedContractor) {
+        status.textContent = "Please select a contractor.";
+        return;
+      }
+
+      const payload = {
+        homeowner_name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        city: document.getElementById("city").value.trim(),
+        state: document.getElementById("state").value.trim(),
+        zip_code: document.getElementById("zip").value.trim(),
+        service: document.getElementById("service").value.trim(),
+        project_details: document.getElementById("details").value.trim(),
+        contractor_id: String(selectedContractor.id || "").trim(),
+        contractor_name: String(selectedContractor.company_name || "").trim()
+      };
+
+      debug.textContent = JSON.stringify(payload, null, 2);
+
+      if (
+        !payload.homeowner_name ||
+        !payload.phone ||
+        !payload.email ||
+        !payload.city ||
+        !payload.state ||
+        !payload.zip_code ||
+        !payload.service ||
+        !payload.project_details ||
+        !payload.contractor_id ||
+        !payload.contractor_name
+      ) {
+        status.textContent = "Please fill out every field and select a contractor.";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const res = await fetch(API + "/leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || data.message || "Error submitting");
+        }
+
+        status.innerHTML = `
+          ✅ Request submitted successfully.<br><br>
+          <a href="https://leadforge-clean.vercel.app/unlock.html?id=${encodeURIComponent(data.lead_id)}">Open Unlock Page</a>
+        `;
+
+        document.getElementById("leadForm").reset();
+        document.querySelectorAll(".contractor").forEach((el) => {
+          el.classList.remove("selected");
+        });
+        selectedContractor = null;
+      } catch (err) {
+        status.textContent = err.message || "Error submitting";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Request";
+      }
+    });
+
+    loadContractors();
+  </script>
+</body>
+</html>
