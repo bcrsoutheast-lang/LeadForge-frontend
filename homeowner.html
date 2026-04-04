@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find a Contractor | LeadForge</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+.header {
+  background: black;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.contractor {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  cursor: pointer;
+}
+
+.contractor.selected {
+  border-color: red;
+}
+
+form {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>Choose Your Contractor</h1>
+</div>
+
+<div class="container">
+
+<div id="contractors"></div>
+
+<form id="form">
+<input id="name" placeholder="Your Name" required>
+<input id="phone" placeholder="Phone" required>
+<input id="email" placeholder="Email" required>
+
+<input id="city" placeholder="City" required>
+<input id="state" placeholder="State" required>
+<input id="zip_code" placeholder="ZIP Code" required>
+
+<select id="service" required>
+<option value="">Select Service</option>
+<option>Roofing</option>
+<option>HVAC</option>
+<option>Painting</option>
+<option>Fencing</option>
+</select>
+
+<textarea id="project_details" placeholder="Project Details" required></textarea>
+
+<button type="submit">Submit Request</button>
+</form>
+
+</div>
+
+<script>
+const API = "https://leadforge-llc.onrender.com";
+
+let selected = null;
+
+// LOAD CONTRACTORS
+async function load() {
+  const res = await fetch(API + "/contractors");
+  const data = await res.json();
+
+  const container = document.getElementById("contractors");
+
+  data.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "contractor";
+
+    div.innerHTML = `
+      <b>${c.business_name}</b><br>
+      ${c.trade}<br>
+      ${c.service_area}
+    `;
+
+    div.onclick = () => {
+      document.querySelectorAll(".contractor").forEach(x => x.classList.remove("selected"));
+      div.classList.add("selected");
+      selected = c;
+    };
+
+    container.appendChild(div);
+  });
+}
+
+load();
+
+// SUBMIT
+document.getElementById("form").onsubmit = async (e) => {
+  e.preventDefault();
+
+  if (!selected) {
+    alert("Select a contractor");
+    return;
+  }
+
+  const payload = {
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    email: document.getElementById("email").value.trim(),
+
+    city: document.getElementById("city").value.trim(),
+    state: document.getElementById("state").value.trim(),
+    zip_code: document.getElementById("zip_code").value.trim(),
+
+    service: document.getElementById("service").value,
+    project_details: document.getElementById("project_details").value.trim(),
+
+    contractor_id: selected.id,
+    contractor_name: selected.business_name
+  };
+
+  const res = await fetch(API + "/leads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const result = await res.json();
+
+  if (result.success) {
+    alert("Submitted successfully");
+  } else {
+    alert("Error submitting");
+  }
+};
+</script>
+
+</body>
+</html>
