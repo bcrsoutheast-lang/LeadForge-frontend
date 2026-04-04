@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Details | LeadForge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #111;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .row {
+      margin-bottom: 14px;
+    }
+
+    .label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #666;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .value {
+      font-size: 16px;
+      color: #111;
+      word-break: break-word;
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.error {
+      background: #fdecec;
+      color: #991b1b;
+      border: 1px solid #f5b5b5;
+    }
+
+    .status.success {
+      background: #e8f7ec;
+      color: #166534;
+      border: 1px solid #b7e4c7;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 18px;
+      color: #0b57d0;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Lead Details</h1>
+    <p>
+      This page shows the full homeowner information after payment is verified.
+    </p>
+
+    <div id="statusBox" class="status"></div>
+
+    <div class="card">
+      <div class="row">
+        <span class="label">Homeowner Name</span>
+        <div class="value" id="homeowner_name">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Phone</span>
+        <div class="value" id="phone">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Email</span>
+        <div class="value" id="email">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Location</span>
+        <div class="value" id="location">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Service Needed</span>
+        <div class="value" id="service">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Project Details</span>
+        <div class="value" id="project_details">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Chosen Contractor</span>
+        <div class="value" id="contractor_name">Loading...</div>
+      </div>
+
+      <div class="row">
+        <span class="label">Unlocked</span>
+        <div class="value" id="unlocked">Loading...</div>
+      </div>
+    </div>
+
+    <a class="back-link" href="/admin.html">Back to Admin</a>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const statusBox = document.getElementById("statusBox");
+
+    const homeownerNameEl = document.getElementById("homeowner_name");
+    const phoneEl = document.getElementById("phone");
+    const emailEl = document.getElementById("email");
+    const locationEl = document.getElementById("location");
+    const serviceEl = document.getElementById("service");
+    const projectDetailsEl = document.getElementById("project_details");
+    const contractorNameEl = document.getElementById("contractor_name");
+    const unlockedEl = document.getElementById("unlocked");
+
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get("id");
+    const sessionId = params.get("session_id");
+
+    function showStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = "status show " + type;
+    }
+
+    function formatLocation(city, state, zip) {
+      return [city, state, zip].filter(Boolean).join(", ") || "Not provided";
+    }
+
+    async function verifyIfNeeded() {
+      if (!leadId) {
+        throw new Error("Missing lead ID in the URL.");
+      }
+
+      if (sessionId) {
+        const response = await fetch(
+          `${API_BASE}/verify-unlock?lead_id=${encodeURIComponent(leadId)}&session_id=${encodeURIComponent(sessionId)}`
+        );
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.detail || "Could not verify payment");
+        }
+
+        if (!result.unlocked) {
+          throw new Error(result.message || "Payment not completed");
+        }
+
+        showStatus("Payment verified. Lead unlocked successfully.", "success");
+      }
+    }
+
+    async function loadLead() {
+      try {
+        await verifyIfNeeded();
+
+        const response = await fetch(`${API_BASE}/leads/${leadId}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.detail || "Could not load lead");
+        }
+
+        if (!result.unlocked) {
+          throw new Error("This lead has not been unlocked yet.");
+        }
+
+        homeownerNameEl.textContent = result.homeowner_name || "Not provided";
+        phoneEl.textContent = result.phone || "Not provided";
+        emailEl.textContent = result.email || "Not provided";
+        locationEl.textContent = formatLocation(result.city, result.state, result.zip_code);
+        serviceEl.textContent = result.service || "Not provided";
+        projectDetailsEl.textContent = result.project_details || "Not provided";
+        contractorNameEl.textContent = result.contractor_name || "Not assigned";
+        unlockedEl.textContent = result.unlocked ? "Yes" : "No";
+      } catch (error) {
+        console.error(error);
+        showStatus(error.message || "Could not load lead details", "error");
+        homeownerNameEl.textContent = "-";
+        phoneEl.textContent = "-";
+        emailEl.textContent = "-";
+        locationEl.textContent = "-";
+        serviceEl.textContent = "-";
+        projectDetailsEl.textContent = "-";
+        contractorNameEl.textContent = "-";
+        unlockedEl.textContent = "-";
+      }
+    }
+
+    loadLead();
+  </script>
+</body>
+</html>
