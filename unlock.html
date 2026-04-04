@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unlock Lead | LeadForge</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 32px;
+    }
+
+    .sub {
+      color: #555;
+      margin-bottom: 24px;
+    }
+
+    .box {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .masked {
+      letter-spacing: 0.08em;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #111;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 16px;
+      font-size: 15px;
+      color: #444;
+    }
+
+    .small {
+      margin-top: 18px;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .top-note {
+      display: inline-block;
+      background: #e8f1ff;
+      color: #174ea6;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top-note">Exclusive Opportunity</div>
+      <h1>Unlock This Lead</h1>
+      <div class="sub">Pay once to view full homeowner details and project information.</div>
+
+      <div class="box">
+        <div class="label">Chosen Contractor</div>
+        <div class="value" id="contractorName">Loading...</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Homeowner</div>
+        <div class="value masked" id="homeownerName">••••••••</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Phone</div>
+        <div class="value masked" id="phone">•••-•••-••••</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Email</div>
+        <div class="value masked" id="email">••••••@••••.com</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Service Requested</div>
+        <div class="value" id="service">Loading...</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Project Details</div>
+        <div class="value" id="projectDetails">This will unlock after payment.</div>
+      </div>
+
+      <button class="btn" id="unlockBtn">Unlock for $10</button>
+      <div class="status" id="status"></div>
+
+      <div class="small">
+        Once payment is completed, you’ll be redirected to the full lead details page.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+
+    const params = new URLSearchParams(window.location.search);
+    const leadId = params.get("id");
+
+    const contractorNameEl = document.getElementById("contractorName");
+    const homeownerNameEl = document.getElementById("homeownerName");
+    const phoneEl = document.getElementById("phone");
+    const emailEl = document.getElementById("email");
+    const serviceEl = document.getElementById("service");
+    const projectDetailsEl = document.getElementById("projectDetails");
+    const unlockBtn = document.getElementById("unlockBtn");
+    const statusEl = document.getElementById("status");
+
+    function maskName(name) {
+      if (!name) return "Hidden until unlocked";
+      return "Hidden until unlocked";
+    }
+
+    function maskPhone(phone) {
+      if (!phone) return "Hidden until unlocked";
+      return "Hidden until unlocked";
+    }
+
+    function maskEmail(email) {
+      if (!email) return "Hidden until unlocked";
+      return "Hidden until unlocked";
+    }
+
+    async function loadLead() {
+      if (!leadId) {
+        statusEl.textContent = "Missing lead ID in the URL.";
+        unlockBtn.disabled = true;
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/leads/${leadId}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || "Failed to load lead");
+        }
+
+        contractorNameEl.textContent = data.contractor_name || "Selected contractor";
+        homeownerNameEl.textContent = maskName(data.homeowner_name);
+        phoneEl.textContent = maskPhone(data.phone);
+        emailEl.textContent = maskEmail(data.email);
+        serviceEl.textContent = data.service || "Service request submitted";
+        projectDetailsEl.textContent = "Unlock to view full project details.";
+
+        if (data.unlocked) {
+          statusEl.innerHTML = `This lead is already unlocked. <a href="lead-detail.html?id=${leadId}">Open full details</a>`;
+          unlockBtn.textContent = "Open Full Details";
+          unlockBtn.onclick = () => {
+            window.location.href = `lead-detail.html?id=${leadId}`;
+          };
+        }
+      } catch (err) {
+        statusEl.textContent = err.message || "Something went wrong loading the lead.";
+        unlockBtn.disabled = true;
+      }
+    }
+
+    async function startCheckout() {
+      unlockBtn.disabled = true;
+      unlockBtn.textContent = "Starting checkout...";
+      statusEl.textContent = "";
+
+      try {
+        const res = await fetch(`${API_BASE}/create-checkout-session`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ lead_id: leadId })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || "Failed to create checkout session");
+        }
+
+        if (!data.url) {
+          throw new Error("Stripe checkout URL missing");
+        }
+
+        window.location.href = data.url;
+      } catch (err) {
+        statusEl.textContent = err.message || "Could not start payment.";
+        unlockBtn.disabled = false;
+        unlockBtn.textContent = "Unlock for $10";
+      }
+    }
+
+    unlockBtn.addEventListener("click", startCheckout);
+
+    loadLead();
+  </script>
+</body>
+</html>
