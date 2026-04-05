@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join LeadForge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+      color: #111;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 32px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      box-sizing: border-box;
+      margin-bottom: 6px;
+      background: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #111;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 18px;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .success {
+      background: #e8f7ec;
+      color: #166534;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      border: 1px solid #b7e4c7;
+    }
+
+    .error {
+      background: #fdecec;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      border: 1px solid #f5b5b5;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Join LeadForge</h1>
+    <p>Get exclusive homeowner requests in your area. Only pay when you choose to unlock a job.</p>
+
+    <div id="message"></div>
+
+    <form id="contractorForm" novalidate>
+      <label for="company">Company Name</label>
+      <input type="text" id="company" placeholder="ABC Roofing" />
+
+      <label for="name">Contact Name</label>
+      <input type="text" id="name" placeholder="John Smith" />
+
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" placeholder="2055551234" inputmode="tel" />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="name@company.com" inputmode="email" />
+
+      <label for="service">Service Type</label>
+      <select id="service">
+        <option value="">Select Service</option>
+        <option value="Roofing">Roofing</option>
+        <option value="HVAC">HVAC</option>
+        <option value="Plumbing">Plumbing</option>
+        <option value="Landscaping">Landscaping</option>
+        <option value="General Contractor">General Contractor</option>
+      </select>
+
+      <label for="city">City</label>
+      <input type="text" id="city" placeholder="Birmingham" />
+
+      <label for="state">State</label>
+      <input type="text" id="state" placeholder="AL" maxlength="2" />
+
+      <label for="zip">Zip Code</label>
+      <input type="text" id="zip" placeholder="35203" inputmode="numeric" />
+
+      <div class="hint">All main fields should be filled before you apply.</div>
+
+      <button type="submit" id="submitBtn">Apply Now</button>
+    </form>
+  </div>
+
+  <script>
+    const API_BASE = "https://leadforge-llc.onrender.com";
+    const form = document.getElementById("contractorForm");
+    const message = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showMessage(type, text) {
+      message.innerHTML = `<div class="${type}">${text}</div>`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clean(value) {
+      return (value || "").trim();
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      message.innerHTML = "";
+
+      const payload = {
+        company_name: clean(document.getElementById("company").value),
+        contact_name: clean(document.getElementById("name").value),
+        phone: clean(document.getElementById("phone").value),
+        email: clean(document.getElementById("email").value),
+        service_type: clean(document.getElementById("service").value),
+        city: clean(document.getElementById("city").value),
+        state: clean(document.getElementById("state").value).toUpperCase(),
+        zip_code: clean(document.getElementById("zip").value),
+        website: "",
+        notes: ""
+      };
+
+      if (!payload.company_name) {
+        showMessage("error", "Enter company name.");
+        return;
+      }
+
+      if (!payload.contact_name) {
+        showMessage("error", "Enter contact name.");
+        return;
+      }
+
+      if (!payload.phone) {
+        showMessage("error", "Enter phone number.");
+        return;
+      }
+
+      if (!payload.email) {
+        showMessage("error", "Enter email.");
+        return;
+      }
+
+      if (!payload.service_type) {
+        showMessage("error", "Choose a service type.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const res = await fetch(`${API_BASE}/contractors`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const raw = await res.text();
+        let data = {};
+
+        try {
+          data = raw ? JSON.parse(raw) : {};
+        } catch (parseError) {
+          throw new Error(`Unexpected response: ${raw || "empty response"}`);
+        }
+
+        if (!res.ok) {
+          throw new Error(data.detail || data.message || "Error submitting contractor application.");
+        }
+
+        showMessage("success", "Application submitted! We’ll review and approve you shortly.");
+        form.reset();
+      } catch (err) {
+        showMessage("error", err.message || "Could not submit application.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Apply Now";
+      }
+    });
+  </script>
+</body>
+</html>
