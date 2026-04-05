@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join LeadForge</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+h1 {
+    margin-top: 0;
+}
+
+p {
+    color: #555;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.6;
+}
+
+.success {
+    background: #e8f7ec;
+    color: #166534;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.error {
+    background: #fdecec;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Join LeadForge</h1>
+    <p>Get exclusive homeowner requests in your area. Only pay when you choose to unlock a job.</p>
+
+    <form id="contractorForm">
+
+        <label>Company Name</label>
+        <input type="text" id="company" required>
+
+        <label>Contact Name</label>
+        <input type="text" id="name" required>
+
+        <label>Phone</label>
+        <input type="tel" id="phone" required>
+
+        <label>Email</label>
+        <input type="email" id="email" required>
+
+        <label>Service Type</label>
+        <select id="service" required>
+            <option value="">Select Service</option>
+            <option>Roofing</option>
+            <option>HVAC</option>
+            <option>Plumbing</option>
+            <option>Landscaping</option>
+            <option>General Contractor</option>
+        </select>
+
+        <label>City</label>
+        <input type="text" id="city">
+
+        <label>State</label>
+        <input type="text" id="state">
+
+        <label>Zip Code</label>
+        <input type="text" id="zip">
+
+        <button type="submit">Apply Now</button>
+
+    </form>
+
+    <div id="message"></div>
+</div>
+
+<script>
+const form = document.getElementById("contractorForm");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    message.innerHTML = "";
+
+    const payload = {
+        company_name: document.getElementById("company").value,
+        contact_name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        service_type: document.getElementById("service").value,
+        city: document.getElementById("city").value,
+        state: document.getElementById("state").value,
+        zip_code: document.getElementById("zip").value
+    };
+
+    try {
+        const res = await fetch("https://leadforge-llc.onrender.com/contractors", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.detail || "Error submitting");
+        }
+
+        message.innerHTML = `<div class="success">Application submitted! We’ll review and approve you shortly.</div>`;
+        form.reset();
+
+    } catch (err) {
+        message.innerHTML = `<div class="error">${err.message}</div>`;
+    }
+});
+</script>
+
+</body>
+</html>
